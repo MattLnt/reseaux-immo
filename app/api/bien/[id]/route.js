@@ -66,6 +66,7 @@ export async function PUT(req, { params }) {
         localisation: body.localisation,
         prix: body.prix,
         tauxCommission: body.tauxCommission,
+        partRetrocedee: body.partRetrocedee != null ? parseInt(body.partRetrocedee) : 30,
         typeBien: body.typeBien,
         etatBien: body.etatBien,
         nbrChambres: body.nbrChambres,
@@ -78,6 +79,8 @@ export async function PUT(req, { params }) {
         descriptionCourte: body.descriptionCourte,
         lienAnnonce: body.lienAnnonce,
         photos: body.photos,
+        // statut n'est mis à jour que s'il est fourni (toggle archiver/réactiver)
+        ...(body.statut ? { statut: body.statut } : {}),
       }
     });
 

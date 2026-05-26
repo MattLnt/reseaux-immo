@@ -69,6 +69,7 @@ model Bien {
   
   // Commission & détails
   tauxCommission  Float
+  partRetrocedee  Int       @default(30)
   typeBien        TypeBien
   etatBien        EtatBien
   lienAnnonce     String?

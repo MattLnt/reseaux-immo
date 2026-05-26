@@ -19,6 +19,7 @@ export default function BienForm({ initialData = null, mode = "create" }) {
     localisation: "",
     prix: "",
     tauxCommission: "",
+    partRetrocedee: 30,
     typeBien: "",
     etatBien: "",
     nbrChambres: "",
@@ -53,6 +54,7 @@ export default function BienForm({ initialData = null, mode = "create" }) {
         localisation: initialData.localisation || "",
         prix: initialData.prix?.toString() || "",
         tauxCommission: initialData.tauxCommission?.toString() || "",
+        partRetrocedee: initialData.partRetrocedee ?? 30,
         typeBien: initialData.typeBien || "",
         etatBien: initialData.etatBien || "",
         nbrChambres: initialData.nbrChambres?.toString() || "",
@@ -89,6 +91,7 @@ export default function BienForm({ initialData = null, mode = "create" }) {
       ...form,
       prix: parseFloat(form.prix),
       tauxCommission: parseFloat(form.tauxCommission),
+      partRetrocedee: parseInt(form.partRetrocedee),
       nbrChambres: parseInt(form.nbrChambres),
       nbrSdb: form.nbrSdb ? parseInt(form.nbrSdb) : null,
       m2Habitable: parseFloat(form.m2Habitable),
@@ -248,7 +251,7 @@ export default function BienForm({ initialData = null, mode = "create" }) {
             <FormSection
               icon={<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>}
               title="Prix et commission"
-              subtitle="Informations financières"
+              subtitle="Informations financières et rétrocession"
             >
               <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: 12, marginBottom: 20 }}>
                 <FormInput
@@ -277,17 +280,106 @@ export default function BienForm({ initialData = null, mode = "create" }) {
                 />
               </div>
 
-              {/* Commission calculée */}
-              <div style={{ background: "#002B54", borderRadius: 12, padding: "16px 18px" }}>
-                <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.6)", textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 6 }}>
-                  Commission totale estimée
-                </label>
-                <div style={{ fontSize: 20, fontWeight: 700, color: "#FF9500" }}>
-                  {form.prix && form.tauxCommission 
-                    ? `${((parseFloat(form.prix) * parseFloat(form.tauxCommission)) / 100).toLocaleString('fr-BE')} €`
-                    : "— €"}
-                </div>
-              </div>
+              {/* Commission calculée + jauge de rétrocession */}
+              {(() => {
+                const commissionTotale = form.prix && form.tauxCommission
+                  ? (parseFloat(form.prix) * parseFloat(form.tauxCommission)) / 100
+                  : 0;
+                const montantRetrocede = commissionTotale * (parseInt(form.partRetrocedee) / 100);
+                const montantConserve = commissionTotale - montantRetrocede;
+                const fmt = (n) => Math.round(n).toLocaleString('fr-BE');
+
+                return (
+                  <div style={{ background: "#002B54", borderRadius: 12, padding: "18px 20px" }}>
+                    {/* Ligne 1 : commission totale */}
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", paddingBottom: 16, borderBottom: "1px solid rgba(255,255,255,0.1)" }}>
+                      <label style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.6)", textTransform: "uppercase", letterSpacing: "0.07em" }}>
+                        Commission totale estimée
+                      </label>
+                      <div style={{ fontSize: 19, fontWeight: 700, color: "#fff" }}>
+                        {commissionTotale > 0 ? `${fmt(commissionTotale)} €` : "— €"}
+                      </div>
+                    </div>
+
+                    {/* Jauge de rétrocession */}
+                    <div style={{ paddingTop: 16 }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+                        <label style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.6)", textTransform: "uppercase", letterSpacing: "0.07em" }}>
+                          Part rétrocédée à l'apporteur
+                        </label>
+                        <span style={{ fontSize: 14, fontWeight: 700, color: "#FF9500" }}>
+                          {form.partRetrocedee}%
+                        </span>
+                      </div>
+
+                      {/* Slider 5% → 60% par paliers de 5 */}
+                      <div style={{ marginBottom: 16 }}>
+                        <style>{`
+                          .retro-slider {
+                            -webkit-appearance: none; appearance: none;
+                            width: 100%; height: 8px; border-radius: 99px;
+                            background: rgba(255,255,255,0.12);
+                            outline: none; cursor: pointer;
+                          }
+                          .retro-slider::-webkit-slider-thumb {
+                            -webkit-appearance: none; appearance: none;
+                            width: 22px; height: 22px; border-radius: 50%;
+                            background: #FF9500; cursor: pointer;
+                            border: 3px solid #fff;
+                            box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+                          }
+                          .retro-slider::-moz-range-thumb {
+                            width: 22px; height: 22px; border-radius: 50%;
+                            background: #FF9500; cursor: pointer;
+                            border: 3px solid #fff;
+                            box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+                          }
+                        `}</style>
+                        <input
+                          type="range"
+                          className="retro-slider"
+                          min={5}
+                          max={60}
+                          step={5}
+                          value={form.partRetrocedee}
+                          onChange={e => setForm({ ...form, partRetrocedee: parseInt(e.target.value) })}
+                          style={{
+                            background: `linear-gradient(to right, #FF9500 0%, #FF9500 ${((form.partRetrocedee - 5) / 55) * 100}%, rgba(255,255,255,0.12) ${((form.partRetrocedee - 5) / 55) * 100}%, rgba(255,255,255,0.12) 100%)`,
+                          }}
+                        />
+                        <div style={{ display: "flex", justifyContent: "space-between", marginTop: 6 }}>
+                          <span style={{ fontSize: 10, color: "rgba(255,255,255,0.4)", fontWeight: 600 }}>5%</span>
+                          <span style={{ fontSize: 10, color: "rgba(255,255,255,0.4)", fontWeight: 600 }}>60%</span>
+                        </div>
+                      </div>
+
+                      {/* Montants détaillés */}
+                      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+                        <div style={{ background: "rgba(255,149,0,0.12)", border: "1px solid rgba(255,149,0,0.25)", borderRadius: 10, padding: "12px 14px" }}>
+                          <div style={{ fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,0.55)", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 4 }}>
+                            Pour l'apporteur
+                          </div>
+                          <div style={{ fontSize: 17, fontWeight: 700, color: "#FF9500" }}>
+                            {commissionTotale > 0 ? `${fmt(montantRetrocede)} €` : "— €"}
+                          </div>
+                        </div>
+                        <div style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 10, padding: "12px 14px" }}>
+                          <div style={{ fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,0.55)", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 4 }}>
+                            Vous conservez
+                          </div>
+                          <div style={{ fontSize: 17, fontWeight: 700, color: "#fff" }}>
+                            {commissionTotale > 0 ? `${fmt(montantConserve)} €` : "— €"}
+                          </div>
+                        </div>
+                      </div>
+
+                      <p style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", margin: "12px 0 0", lineHeight: 1.5 }}>
+                        Montant versé à l'agence qui vous apporte un acheteur si la vente aboutit.
+                      </p>
+                    </div>
+                  </div>
+                );
+              })()}
             </FormSection>
 
             {/* Type & État */}
