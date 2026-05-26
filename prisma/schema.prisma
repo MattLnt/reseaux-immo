@@ -1,0 +1,160 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  role      Role     @default(AGENCE)
+  agenceId  String?  @unique
+  agence    Agence?  @relation(fields: [agenceId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum Role {
+  ADMIN
+  AGENCE
+}
+
+model Agence {
+  id          String   @id @default(cuid())
+  nom         String
+  adresse     String
+  telephone   String
+  email       String
+  logo        String?
+  photo       String?
+  horaire     String?  @db.Text
+  description String?  @db.Text
+  
+  // Validation admin
+  isActive    Boolean  @default(false)
+  
+  // Relations
+  user             User?
+  biens            Bien[]
+  contactsEnvoyes  Contact[] @relation("AgenceEnvoyeur")
+  contactsRecus    Contact[] @relation("AgenceRecepteur")
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Bien {
+  id          String   @id @default(cuid())
+  agenceId    String
+  agence      Agence   @relation(fields: [agenceId], references: [id], onDelete: Cascade)
+  
+  // Infos principales
+  prix            Int
+  localisation    String
+  nbrChambres     Int
+  nbrSdb          Int
+  m2Terrain       Int?
+  m2Habitable     Int
+  photos          String[]
+  
+  // Infos optionnelles
+  rendementLocatif  Float?
+  peb               PEB?
+  revenuCadastral   Int?
+  descriptionCourte String?  @db.Text
+  
+  // Commission & détails
+  tauxCommission  Float
+  typeBien        TypeBien
+  etatBien        EtatBien
+  lienAnnonce     String?
+  
+  // Statut
+  statut      StatutBien @default(ACTIF)
+  
+  // Relations
+  contacts    Contact[]
+  
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  
+  @@index([statut])
+  @@index([typeBien])
+  @@index([prix])
+  @@index([localisation])
+}
+
+enum PEB {
+  A_PLUS
+  A
+  B
+  C
+  D
+  E
+  F
+  G
+}
+
+enum TypeBien {
+  APPARTEMENT
+  MAISON
+  VILLA
+  BUREAU
+  IMMEUBLE
+  AUTRE
+}
+
+enum EtatBien {
+  OCCASION
+  NEUF
+  PROJET
+  AUTRE
+}
+
+enum StatutBien {
+  ACTIF
+  ARCHIVE
+  SUPPRIME
+}
+
+model Contact {
+  id        String   @id @default(cuid())
+  
+  // Relations
+  bienId              String
+  bien                Bien   @relation(fields: [bienId], references: [id], onDelete: Cascade)
+  
+  agenceEnvoyeurId    String
+  agenceEnvoyeur      Agence @relation("AgenceEnvoyeur", fields: [agenceEnvoyeurId], references: [id], onDelete: Cascade)
+  
+  agenceRecepteurId   String
+  agenceRecepteur     Agence @relation("AgenceRecepteur", fields: [agenceRecepteurId], references: [id], onDelete: Cascade)
+  
+  // Infos acheteur potentiel
+  prenom      String
+  nom         String
+  telephone   String
+  email       String
+  remarques   String?  @db.Text
+  
+  // Suivi
+  indicateur  IndicateurContact @default(EN_COURS)
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@index([agenceEnvoyeurId])
+  @@index([agenceRecepteurId])
+  @@index([bienId])
+}
+
+enum IndicateurContact {
+  EN_COURS
+  SIGNE
+  PAS_INTERESSE
+  AUTRE
+}
