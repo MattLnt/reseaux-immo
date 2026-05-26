@@ -1,17 +1,13 @@
 "use client";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { useSession } from "next-auth/react";
 
 export default function PublicNav({ dark = false }) {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [session, setSession] = useState(null);
-
-  useEffect(() => {
-    fetch("/api/auth/session")
-      .then(r => r.json())
-      .then(data => { if (data?.user) setSession(data); });
-  }, []);
+  const { data: session, status } = useSession();
+  const authLoaded = status !== "loading";
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -87,7 +83,9 @@ export default function PublicNav({ dark = false }) {
             <Link key={l.href} href={l.href} style={{ color: links, fontSize: 14, textDecoration: "none", fontWeight: 500 }}>{l.label}</Link>
           ))}
 
-          {session ? (
+          {!authLoaded ? (
+            <div style={{ width: 168, height: 36 }} />
+          ) : session ? (
             <Link href={dashboardHref}
               style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "#FF9500", color: "#fff", padding: "8px 16px", borderRadius: 8, fontSize: 14, fontWeight: 700, textDecoration: "none" }}>
               <div style={{ width: 22, height: 22, borderRadius: "50%", background: "rgba(255,255,255,0.25)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 700 }}>
@@ -153,7 +151,7 @@ export default function PublicNav({ dark = false }) {
             </div>
 
             <div style={{ display: "flex", flexDirection: "column", gap: 10, animation: "itemIn 0.4s ease 0.38s both" }}>
-              {session ? (
+              {!authLoaded ? null : session ? (
                 <Link href={dashboardHref} onClick={() => setMenuOpen(false)}
                   style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, padding: "16px", background: "#FF9500", borderRadius: 14, fontSize: 15, fontWeight: 700, color: "#fff", textDecoration: "none" }}>
                   <div style={{ width: 26, height: 26, borderRadius: "50%", background: "rgba(255,255,255,0.25)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 700 }}>
