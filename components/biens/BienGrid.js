@@ -13,13 +13,14 @@ export default function BienGrid({ biens, hasFilters = false }) {
 
   return (
     <div>
-      <style>{`
-        @media (max-width: 1024px) {
-          .catalogue-grid { grid-template-columns: 1fr !important; }
-        }
-      `}</style>
-      
-      <div className="catalogue-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 20 }}>
+      <div style={{ fontSize: 13, color: '#5A6B7D', marginBottom: 16, fontWeight: 500 }}>
+        {biens.length} bien{biens.length > 1 ? 's' : ''} dans le réseau
+      </div>
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
+        gap: 20,
+      }}>
         {biens.map((bien) => (
           <BienCard key={bien.id} bien={bien} />
         ))}
