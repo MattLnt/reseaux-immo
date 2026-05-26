@@ -1,15 +1,7 @@
 "use client";
 import { useState } from "react";
 
-function validateBce(val) {
-  return /^\d{10}$/.test(val.replace(/\./g, "").replace(/\s/g, ""));
-}
-
-function formatBce(val) {
-  return val.replace(/\D/g, "");
-}
-
-export default function ProfilForm({ initialData, role }) {
+export default function ProfilForm({ initialData }) {
   const [form, setForm] = useState(initialData || {});
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
@@ -17,13 +9,8 @@ export default function ProfilForm({ initialData, role }) {
 
   async function handleSubmit(e) {
     e.preventDefault();
-    if (role === "VENDEUR" && form.numeroBce && !validateBce(form.numeroBce)) {
-      setError("Le numéro BCE doit contenir exactement 10 chiffres (ex: 0663760904)");
-      return;
-    }
     setLoading(true); setError(""); setSuccess(false);
-    const endpoint = role === "VENDEUR" ? "/api/vendeur/profil" : "/api/acheteur/profil";
-    const res = await fetch(endpoint, {
+    const res = await fetch("/api/agence/profil", {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(form),
@@ -36,189 +23,233 @@ export default function ProfilForm({ initialData, role }) {
 
   const inputStyle = {
     width: "100%", padding: "12px 14px", borderRadius: 12,
-    border: "1.5px solid #E5E7EB", fontSize: 14, boxSizing: "border-box",
-    outline: "none", background: "#FAFAFA", color: "#111827", transition: "border-color 0.2s",
+    border: "1.5px solid #E8EDF2", fontSize: 14, boxSizing: "border-box",
+    outline: "none", background: "#FAFDFD", color: "#002B54", transition: "border-color 0.2s",
   };
   const labelStyle = {
-    display: "block", fontSize: 11, fontWeight: 700, color: "#6B7280",
+    display: "block", fontSize: 11, fontWeight: 700, color: "#5A6B7D",
     textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 8,
   };
 
-  const bceValid = form.numeroBce ? validateBce(form.numeroBce) : false;
-  const isValid = form.nomBureau && form.nomCEO && form.telephone && form.adresse && form.numeroBce && bceValid;
+  const champs = [
+    { label: "Nom de l'agence", done: !!form.nom },
+    { label: "Téléphone", done: !!form.telephone },
+    { label: "Email", done: !!form.email },
+    { label: "Adresse", done: !!form.adresse },
+    { label: "Horaires", done: !!form.horaire },
+    { label: "Description", done: !!form.description },
+  ];
+  const completes = champs.filter(c => c.done).length;
+  const pourcentage = Math.round((completes / champs.length) * 100);
+  const isValid = form.nom && form.adresse && form.telephone && form.email;
+  const initiale = (form.nom || "A").charAt(0).toUpperCase();
 
   return (
-    <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "center" }}>
+    <form onSubmit={handleSubmit}>
       <style>{`
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         @media (max-width: 1024px) {
-          .profil-layout { flex-direction: column !important; max-width: 520px !important; }
-          .profil-right { display: none !important; }
+          .profil-grid { grid-template-columns: 1fr !important; }
+          .profil-banner { flex-direction: column !important; align-items: flex-start !important; gap: 20px !important; }
+          .profil-banner-progress { width: 100% !important; }
           .profil-grid2 { grid-template-columns: 1fr !important; }
         }
       `}</style>
 
-      <div className="profil-layout" style={{ display: "flex", gap: 24, width: "100%", maxWidth: 860, alignItems: "flex-start" }}>
+      {/* Bannière */}
+      <div className="profil-banner" style={{
+        background: "#001B38", borderRadius: 20, padding: "28px 32px",
+        display: "flex", alignItems: "center", justifyContent: "space-between",
+        marginBottom: 20, position: "relative", overflow: "hidden",
+      }}>
+        <div style={{ position: "absolute", top: -60, right: -40, width: 280, height: 280, borderRadius: "50%", background: "radial-gradient(ellipse, rgba(255,149,0,0.1) 0%, transparent 70%)", pointerEvents: "none" }} />
 
-        {/* Formulaire */}
-        <div style={{ flex: "0 0 480px", minWidth: 0 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 20, position: "relative", zIndex: 1 }}>
+          <div style={{
+            width: 72, height: 72, borderRadius: 18, flexShrink: 0,
+            background: "linear-gradient(135deg, #FF9500, #CC7700)",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            fontSize: 30, fontWeight: 700, color: "#fff",
+            boxShadow: "0 6px 20px rgba(255,149,0,0.35)",
+          }}>
+            {initiale}
+          </div>
+          <div>
+            <h2 style={{ fontSize: 22, fontWeight: 700, color: "#fff", margin: "0 0 4px", letterSpacing: "-0.02em" }}>
+              {form.nom || "Votre agence"}
+            </h2>
+            <p style={{ fontSize: 13, color: "rgba(255,255,255,0.55)", margin: 0, display: "flex", alignItems: "center", gap: 6 }}>
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#FF9500" strokeWidth="2"><path d="M20 6L9 17l-5-5"/></svg>
+              Agence partenaire du réseau
+            </p>
+          </div>
+        </div>
 
-          {/* Bandeau succès en haut du form — reste visible */}
-          {success && (
-            <div style={{ background: "#F0FDF4", border: "1px solid #BBF7D0", borderRadius: 10, padding: "12px 16px", color: "#15803D", fontSize: 13, marginBottom: 16, display: "flex", alignItems: "center", gap: 8 }}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-              Profil mis à jour avec succès !
-            </div>
-          )}
+        <div className="profil-banner-progress" style={{ position: "relative", zIndex: 1, minWidth: 220 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 8 }}>
+            <span style={{ fontSize: 12, color: "rgba(255,255,255,0.55)", fontWeight: 600 }}>Profil complété</span>
+            <span style={{ fontSize: 18, fontWeight: 700, color: "#FF9500" }}>{pourcentage}%</span>
+          </div>
+          <div style={{ height: 8, background: "rgba(255,255,255,0.1)", borderRadius: 99, overflow: "hidden" }}>
+            <div style={{ height: "100%", width: `${pourcentage}%`, background: "linear-gradient(90deg, #FF9500, #FFB84D)", borderRadius: 99, transition: "width 0.4s ease" }} />
+          </div>
+          <p style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", margin: "8px 0 0" }}>
+            {completes}/{champs.length} champs renseignés
+          </p>
+        </div>
+      </div>
 
-          {error && (
-            <div style={{ background: "#FEF2F2", border: "1px solid #FECACA", borderRadius: 10, padding: "12px 16px", color: "#DC2626", fontSize: 13, marginBottom: 16, display: "flex", alignItems: "center", gap: 8 }}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-              {error}
-            </div>
-          )}
+      {success && (
+        <div style={{ background: "#F0FDF4", border: "1px solid #BBF7D0", borderRadius: 12, padding: "12px 16px", color: "#15803D", fontSize: 13, marginBottom: 16, display: "flex", alignItems: "center", gap: 8 }}>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          Profil mis à jour avec succès !
+        </div>
+      )}
+      {error && (
+        <div style={{ background: "#FEF2F2", border: "1px solid #FECACA", borderRadius: 12, padding: "12px 16px", color: "#DC2626", fontSize: 13, marginBottom: 16, display: "flex", alignItems: "center", gap: 8 }}>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          {error}
+        </div>
+      )}
 
-          <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+      {/* Grille principale — pleine largeur */}
+      <div className="profil-grid" style={{ display: "grid", gridTemplateColumns: "1fr 340px", gap: 20, alignItems: "start" }}>
 
-            <div style={{ background: "#fff", borderRadius: 16, border: "1px solid #F3F4F6", padding: "20px 24px" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 18, paddingBottom: 14, borderBottom: "1px solid #F9FAFB" }}>
-                <div style={{ width: 34, height: 34, borderRadius: 9, background: "#F9FAFB", border: "1px solid #F3F4F6", display: "flex", alignItems: "center", justifyContent: "center", color: "#C8A96E" }}>
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-                </div>
-                <div>
-                  <h2 style={{ fontSize: 14, fontWeight: 700, color: "#111827", margin: 0 }}>Votre bureau</h2>
-                  <p style={{ fontSize: 12, color: "#9CA3AF", margin: 0 }}>Informations transmises aux acheteurs après déblocage</p>
-                </div>
+        {/* Colonne gauche — les formulaires */}
+        <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+
+          {/* Coordonnées */}
+          <div style={{ background: "#fff", borderRadius: 16, border: "1px solid #E8EDF2", padding: "24px 28px" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 22, paddingBottom: 16, borderBottom: "1px solid #F0F3F7" }}>
+              <div style={{ width: 38, height: 38, borderRadius: 10, background: "rgba(255,149,0,0.1)", border: "1px solid rgba(255,149,0,0.2)", display: "flex", alignItems: "center", justifyContent: "center", color: "#FF9500" }}>
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
               </div>
-
-              <div className="profil-grid2" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, marginBottom: 14 }}>
-                <div>
-                  <label style={labelStyle}>Nom du bureau *</label>
-                  <input type="text" value={form.nomBureau || ""} onChange={e => setForm({ ...form, nomBureau: e.target.value })} required
-                    placeholder="Bureau Dupont" style={inputStyle}
-                    onFocus={e => e.target.style.borderColor = "#C8A96E"}
-                    onBlur={e => e.target.style.borderColor = "#E5E7EB"} />
-                </div>
-                <div>
-                  <label style={labelStyle}>Nom du dirigeant *</label>
-                  <input type="text" value={form.nomCEO || ""} onChange={e => setForm({ ...form, nomCEO: e.target.value })} required
-                    placeholder="Jean Dupont" style={inputStyle}
-                    onFocus={e => e.target.style.borderColor = "#C8A96E"}
-                    onBlur={e => e.target.style.borderColor = "#E5E7EB"} />
-                </div>
+              <div>
+                <h2 style={{ fontSize: 15, fontWeight: 700, color: "#002B54", margin: 0 }}>Coordonnées de l'agence</h2>
+                <p style={{ fontSize: 12, color: "#9CA3AF", margin: 0 }}>Visibles par les agences du réseau</p>
               </div>
+            </div>
 
-              <div style={{ marginBottom: 14 }}>
+            <div style={{ marginBottom: 16 }}>
+              <label style={labelStyle}>Nom de l'agence *</label>
+              <input type="text" value={form.nom || ""} onChange={e => setForm({ ...form, nom: e.target.value })} required
+                placeholder="Agence Dupont" style={inputStyle}
+                onFocus={e => e.target.style.borderColor = "#FF9500"}
+                onBlur={e => e.target.style.borderColor = "#E8EDF2"} />
+            </div>
+
+            <div className="profil-grid2" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 16 }}>
+              <div>
                 <label style={labelStyle}>Téléphone *</label>
                 <input type="text" value={form.telephone || ""} onChange={e => setForm({ ...form, telephone: e.target.value })} required
                   placeholder="+32 456 78 90 12" style={inputStyle}
-                  onFocus={e => e.target.style.borderColor = "#C8A96E"}
-                  onBlur={e => e.target.style.borderColor = "#E5E7EB"} />
+                  onFocus={e => e.target.style.borderColor = "#FF9500"}
+                  onBlur={e => e.target.style.borderColor = "#E8EDF2"} />
               </div>
-
-              <div style={{ marginBottom: 14 }}>
-                <label style={labelStyle}>Adresse *</label>
-                <input type="text" value={form.adresse || ""} onChange={e => setForm({ ...form, adresse: e.target.value })} required
-                  placeholder="Rue Exemple 1, 1000 Bruxelles" style={inputStyle}
-                  onFocus={e => e.target.style.borderColor = "#C8A96E"}
-                  onBlur={e => e.target.style.borderColor = "#E5E7EB"} />
-              </div>
-
-              {/* Numéro BCE */}
               <div>
-                <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 8 }}>
-                  <label style={{ ...labelStyle, marginBottom: 0 }}>Numéro BCE *</label>
-                  {form.numeroBce && (
-                    bceValid
-                      ? <span style={{ fontSize: 10, fontWeight: 700, color: "#10B981", background: "#F0FDF4", border: "1px solid #BBF7D0", padding: "2px 8px", borderRadius: 20 }}>✓ Valide</span>
-                      : <span style={{ fontSize: 10, fontWeight: 700, color: "#EF4444", background: "#FEF2F2", border: "1px solid #FECACA", padding: "2px 8px", borderRadius: 20 }}>Format incorrect</span>
-                  )}
-                </div>
-                <div style={{ position: "relative" }}>
-                  <input type="text" value={form.numeroBce || ""} onChange={e => setForm({ ...form, numeroBce: formatBce(e.target.value) })} required
-                    placeholder="0123456789" maxLength={10}
-                    style={{ ...inputStyle, borderColor: form.numeroBce && !bceValid ? "#FECACA" : "#E5E7EB", paddingRight: bceValid ? 120 : 14 }}
-                    onFocus={e => e.target.style.borderColor = "#C8A96E"}
-                    onBlur={e => e.target.style.borderColor = form.numeroBce && !bceValid ? "#FECACA" : "#E5E7EB"} />
-                  {form.numeroBce && bceValid && (
-                    <a href={`https://kbopub.economie.fgov.be/kbopub/toonondernemingps.html?ondernemingsnummer=${form.numeroBce}&lang=fr`}
-                      target="_blank" rel="noopener noreferrer"
-                      style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", fontSize: 11, fontWeight: 600, color: "#C8A96E", textDecoration: "none", display: "flex", alignItems: "center", gap: 4 }}>
-                      Vérifier BCE
-                      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-                    </a>
-                  )}
-                </div>
-                <p style={{ fontSize: 11, color: "#9CA3AF", margin: "6px 0 0" }}>
-                  10 chiffres sans espaces ni points — ex: 0123456789
-                </p>
+                <label style={labelStyle}>Email *</label>
+                <input type="email" value={form.email || ""} onChange={e => setForm({ ...form, email: e.target.value })} required
+                  placeholder="contact@agence.be" style={inputStyle}
+                  onFocus={e => e.target.style.borderColor = "#FF9500"}
+                  onBlur={e => e.target.style.borderColor = "#E8EDF2"} />
               </div>
             </div>
 
-            <button type="submit" disabled={loading || !isValid}
-              style={{ padding: "14px", borderRadius: 12, background: !isValid || loading ? "#E5E7EB" : "#111827", color: !isValid || loading ? "#9CA3AF" : "#fff", fontWeight: 700, fontSize: 14, border: "none", cursor: !isValid || loading ? "not-allowed" : "pointer", transition: "all 0.2s", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, boxShadow: isValid && !loading ? "0 4px 20px rgba(17,24,39,0.25)" : "none" }}>
-              {loading
-                ? <><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ animation: "spin 1s linear infinite" }}><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>Enregistrement...</>
-                : <>Enregistrer les modifications <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></>
-              }
-            </button>
-          </form>
+            <div>
+              <label style={labelStyle}>Adresse du bureau *</label>
+              <input type="text" value={form.adresse || ""} onChange={e => setForm({ ...form, adresse: e.target.value })} required
+                placeholder="Rue Exemple 1, 1000 Bruxelles" style={inputStyle}
+                onFocus={e => e.target.style.borderColor = "#FF9500"}
+                onBlur={e => e.target.style.borderColor = "#E8EDF2"} />
+            </div>
+          </div>
+
+          {/* Présentation */}
+          <div style={{ background: "#fff", borderRadius: 16, border: "1px solid #E8EDF2", padding: "24px 28px" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 22, paddingBottom: 16, borderBottom: "1px solid #F0F3F7" }}>
+              <div style={{ width: 38, height: 38, borderRadius: 10, background: "rgba(255,149,0,0.1)", border: "1px solid rgba(255,149,0,0.2)", display: "flex", alignItems: "center", justifyContent: "center", color: "#FF9500" }}>
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              </div>
+              <div>
+                <h2 style={{ fontSize: 15, fontWeight: 700, color: "#002B54", margin: 0 }}>Présentation</h2>
+                <p style={{ fontSize: 12, color: "#9CA3AF", margin: 0 }}>Informations complémentaires (facultatif)</p>
+              </div>
+            </div>
+
+            <div style={{ marginBottom: 16 }}>
+              <label style={labelStyle}>Horaires</label>
+              <input type="text" value={form.horaire || ""} onChange={e => setForm({ ...form, horaire: e.target.value })}
+                placeholder="Lun–Ven : 9h–18h · Sam : 10h–13h" style={inputStyle}
+                onFocus={e => e.target.style.borderColor = "#FF9500"}
+                onBlur={e => e.target.style.borderColor = "#E8EDF2"} />
+            </div>
+
+            <div>
+              <label style={labelStyle}>Description</label>
+              <textarea value={form.description || ""} onChange={e => setForm({ ...form, description: e.target.value })}
+                rows={5} placeholder="Présentez votre agence en quelques mots..."
+                style={{ ...inputStyle, resize: "vertical", lineHeight: 1.6 }}
+                onFocus={e => e.target.style.borderColor = "#FF9500"}
+                onBlur={e => e.target.style.borderColor = "#E8EDF2"} />
+            </div>
+          </div>
+
+          <button type="submit" disabled={loading || !isValid}
+            style={{ padding: "15px", borderRadius: 14, background: !isValid || loading ? "#E5E7EB" : "#FF9500", color: !isValid || loading ? "#9CA3AF" : "#fff", fontWeight: 700, fontSize: 14, border: "none", cursor: !isValid || loading ? "not-allowed" : "pointer", transition: "all 0.2s", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, boxShadow: isValid && !loading ? "0 6px 20px rgba(255,149,0,0.3)" : "none" }}>
+            {loading
+              ? <><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ animation: "spin 1s linear infinite" }}><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>Enregistrement...</>
+              : <>Enregistrer les modifications <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></>
+            }
+          </button>
         </div>
 
-        {/* Colonne droite */}
-        <div className="profil-right" style={{ flex: 1, display: "flex", flexDirection: "column", gap: 12 }}>
+        {/* Colonne droite — infos */}
+        <div style={{ display: "flex", flexDirection: "column", gap: 20, position: "sticky", top: 24 }}>
 
-          <div style={{ background: "#111827", borderRadius: 16, padding: "20px 22px" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
-              <div style={{ width: 32, height: 32, borderRadius: 8, background: "rgba(200,169,110,0.15)", display: "flex", alignItems: "center", justifyContent: "center", color: "#C8A96E" }}>
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+          {/* Complétude */}
+          <div style={{ background: "#fff", borderRadius: 16, border: "1px solid #E8EDF2", padding: "22px 24px" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 18 }}>
+              <div style={{ width: 34, height: 34, borderRadius: 9, background: "#F0FDF4", border: "1px solid #BBF7D0", display: "flex", alignItems: "center", justifyContent: "center", color: "#10B981" }}>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
               </div>
-              <h3 style={{ fontSize: 13, fontWeight: 700, color: "#fff", margin: 0 }}>Confidentialité garantie</h3>
+              <h3 style={{ fontSize: 14, fontWeight: 700, color: "#002B54", margin: 0 }}>Complétude</h3>
             </div>
-            <p style={{ fontSize: 12, color: "#9CA3AF", margin: "0 0 14px", lineHeight: 1.6 }}>
-              Ces informations ne sont jamais affichées publiquement. Elles sont transmises uniquement après un déblocage payant (699 €) par un acheteur vérifié.
-            </p>
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-              {[
-                "Nom et coordonnées masqués sur la plateforme",
-                "Transmission uniquement après déblocage",
-                "Acheteurs vérifiés et abonnés uniquement",
-              ].map((item, i) => (
-                <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 8 }}>
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#C8A96E" strokeWidth="2.5" style={{ flexShrink: 0, marginTop: 2 }}><polyline points="20 6 9 17 4 12"/></svg>
-                  <span style={{ fontSize: 12, color: "#6B7280", lineHeight: 1.5 }}>{item}</span>
+              {champs.map((item, i) => (
+                <div key={i} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "9px 12px", background: item.done ? "#F0FDF4" : "#FAFDFD", borderRadius: 9, border: `1px solid ${item.done ? "#DCFCE7" : "#F0F3F7"}` }}>
+                  <span style={{ fontSize: 12.5, color: item.done ? "#15803D" : "#5A6B7D", fontWeight: item.done ? 600 : 400 }}>{item.label}</span>
+                  {item.done
+                    ? <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#10B981" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                    : <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#D1D5DB" strokeWidth="2"><circle cx="12" cy="12" r="10"/></svg>
+                  }
                 </div>
               ))}
             </div>
           </div>
 
-          <div style={{ background: "#fff", borderRadius: 16, border: "1px solid #F3F4F6", padding: "20px 22px" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
-              <div style={{ width: 32, height: 32, borderRadius: 8, background: "#F0FDF4", border: "1px solid #BBF7D0", display: "flex", alignItems: "center", justifyContent: "center", color: "#10B981" }}>
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+          {/* Pourquoi compléter */}
+          <div style={{ background: "#001B38", borderRadius: 16, padding: "22px 24px" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
+              <div style={{ width: 34, height: 34, borderRadius: 9, background: "rgba(255,149,0,0.15)", display: "flex", alignItems: "center", justifyContent: "center", color: "#FF9500" }}>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
               </div>
-              <h3 style={{ fontSize: 13, fontWeight: 700, color: "#111827", margin: 0 }}>Complétude du profil</h3>
+              <h3 style={{ fontSize: 14, fontWeight: 700, color: "#fff", margin: 0 }}>Pourquoi compléter ?</h3>
             </div>
-            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
               {[
-                { label: "Nom du bureau", done: !!form.nomBureau },
-                { label: "Nom du dirigeant", done: !!form.nomCEO },
-                { label: "Téléphone", done: !!form.telephone },
-                { label: "Adresse", done: !!form.adresse },
-                { label: "Numéro BCE", done: !!form.numeroBce && bceValid },
+                "Vos coordonnées s'affichent sur chacun de vos biens partagés",
+                "Les agences peuvent vous contacter pour un acheteur",
+                "Un profil complet inspire confiance au réseau",
               ].map((item, i) => (
-                <div key={i} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "8px 12px", background: "#F9FAFB", borderRadius: 8 }}>
-                  <span style={{ fontSize: 12, color: "#374151" }}>{item.label}</span>
-                  {item.done
-                    ? <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10B981" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                    : <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#D1D5DB" strokeWidth="2"><circle cx="12" cy="12" r="10"/></svg>
-                  }
+                <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 9 }}>
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#FF9500" strokeWidth="2.5" style={{ flexShrink: 0, marginTop: 2 }}><polyline points="20 6 9 17 4 12"/></svg>
+                  <span style={{ fontSize: 12.5, color: "rgba(255,255,255,0.65)", lineHeight: 1.55 }}>{item}</span>
                 </div>
               ))}
             </div>
           </div>
         </div>
       </div>
-    </div>
+    </form>
   );
 }
