@@ -42,6 +42,7 @@ model Agence {
   biens            Bien[]
   contactsEnvoyes  Contact[] @relation("AgenceEnvoyeur")
   contactsRecus    Contact[] @relation("AgenceRecepteur")
+  acheteurs        Acheteur[]
   
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -158,4 +159,56 @@ enum IndicateurContact {
   SIGNE
   PAS_INTERESSE
   AUTRE
+}
+
+model Acheteur {
+  id              String   @id @default(cuid())
+  agenceId        String
+  agence          Agence   @relation(fields: [agenceId], references: [id], onDelete: Cascade)
+  
+  // Identité (privée — jamais affichée aux autres agences)
+  prenom          String
+  nom             String
+  email           String
+  telephone       String
+  
+  // Critères de recherche
+  budgetMin       Int
+  budgetMax       Int
+  zones           String[]
+  typesBien       TypeBien[]
+  nbrChambresMin  Int?
+  nbrSdbMin       Int?
+  m2HabitableMin  Int?
+  
+  // Profil
+  profilMenage    ProfilMenage
+  remarques       String?       @db.Text
+  
+  // RGPD
+  consentementRGPD Boolean      @default(false)
+  
+  // Statut
+  statut          StatutAcheteur @default(ACTIF)
+  
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  
+  @@index([agenceId])
+  @@index([statut])
+}
+
+enum ProfilMenage {
+  CELIBATAIRE
+  COUPLE_SANS_ENFANT
+  COUPLE_AVEC_ENFANTS
+  FAMILLE
+  INVESTISSEUR
+  AUTRE
+}
+
+enum StatutAcheteur {
+  ACTIF
+  INACTIF
+  TROUVE
 }
