@@ -12,7 +12,9 @@ cloudinary.config({
 export async function POST(req) {
   try {
     const session = await getServerSession(authOptions)
-    if (!session) return NextResponse.json({ error: 'Non autorisé' }, { status: 401 })
+    if (!session?.user?.agenceId) {
+      return NextResponse.json({ error: 'Non autorisé' }, { status: 401 })
+    }
 
     const formData = await req.formData()
     const file = formData.get('file')
@@ -24,7 +26,7 @@ export async function POST(req) {
     const dataUri = `data:${file.type};base64,${base64}`
 
     const result = await cloudinary.uploader.upload(dataUri, {
-      folder: 'courtage/messages',
+      folder: 'reseaux-immo/messages',
       resource_type: 'auto',
       public_id: `msg_${Date.now()}`,
     })

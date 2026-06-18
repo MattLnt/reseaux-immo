@@ -40,9 +40,10 @@ model Agence {
   // Relations
   user             User?
   biens            Bien[]
-  contactsEnvoyes  Contact[] @relation("AgenceEnvoyeur")
-  contactsRecus    Contact[] @relation("AgenceRecepteur")
   acheteurs        Acheteur[]
+  conversationsA   Conversation[] @relation("AgenceA")
+  conversationsB   Conversation[] @relation("AgenceB")
+  messagesEnvoyes  Message[]
   
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -77,9 +78,6 @@ model Bien {
   
   // Statut
   statut      StatutBien @default(ACTIF)
-  
-  // Relations
-  contacts    Contact[]
   
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
@@ -121,44 +119,6 @@ enum StatutBien {
   ACTIF
   ARCHIVE
   SUPPRIME
-}
-
-model Contact {
-  id        String   @id @default(cuid())
-  
-  // Relations
-  bienId              String
-  bien                Bien   @relation(fields: [bienId], references: [id], onDelete: Cascade)
-  
-  agenceEnvoyeurId    String
-  agenceEnvoyeur      Agence @relation("AgenceEnvoyeur", fields: [agenceEnvoyeurId], references: [id], onDelete: Cascade)
-  
-  agenceRecepteurId   String
-  agenceRecepteur     Agence @relation("AgenceRecepteur", fields: [agenceRecepteurId], references: [id], onDelete: Cascade)
-  
-  // Infos acheteur potentiel
-  prenom      String
-  nom         String
-  telephone   String
-  email       String
-  remarques   String?  @db.Text
-  
-  // Suivi
-  indicateur  IndicateurContact @default(EN_COURS)
-  
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  
-  @@index([agenceEnvoyeurId])
-  @@index([agenceRecepteurId])
-  @@index([bienId])
-}
-
-enum IndicateurContact {
-  EN_COURS
-  SIGNE
-  PAS_INTERESSE
-  AUTRE
 }
 
 model Acheteur {
@@ -211,4 +171,44 @@ enum StatutAcheteur {
   ACTIF
   INACTIF
   TROUVE
+}
+
+model Conversation {
+  id          String   @id @default(cuid())
+  
+  // Les 2 agences participantes
+  agenceAId   String
+  agenceA     Agence   @relation("AgenceA", fields: [agenceAId], references: [id], onDelete: Cascade)
+  
+  agenceBId   String
+  agenceB     Agence   @relation("AgenceB", fields: [agenceBId], references: [id], onDelete: Cascade)
+  
+  messages    Message[]
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@index([agenceAId])
+  @@index([agenceBId])
+}
+
+model Message {
+  id              String   @id @default(cuid())
+  
+  conversationId  String
+  conversation    Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  
+  senderId        String   // agenceId de l'expéditeur
+  sender          Agence   @relation(fields: [senderId], references: [id], onDelete: Cascade)
+  
+  content         String?  @db.Text
+  attachmentUrl   String?
+  attachmentName  String?
+  
+  readAt          DateTime?
+  
+  createdAt       DateTime @default(now())
+  
+  @@index([conversationId])
+  @@index([senderId])
 }

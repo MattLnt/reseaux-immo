@@ -1,10 +1,38 @@
+"use client";
+import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export default function AgenceSidebar({ agence, bien }) {
+  const router = useRouter();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
   const commissionTotale = (bien.prix * bien.tauxCommission) / 100;
   const part = bien.partRetrocedee ?? 30;
   const montantRetrocede = commissionTotale * (part / 100);
   const fmt = (n) => Math.round(n).toLocaleString("fr-BE");
+
+  async function handleContactAgence() {
+    setLoading(true);
+    setError("");
+    try {
+      const res = await fetch("/api/messages/conversation", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ targetAgenceId: agence.id }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || "Impossible de démarrer la conversation");
+      }
+      // Redirection vers la messagerie avec la conv sélectionnée
+      router.push(`/dashboard/agence/messages?conv=${data.id}`);
+    } catch (err) {
+      setError(err.message);
+      setLoading(false);
+    }
+  }
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 16, position: "sticky", top: 20 }}>
@@ -77,9 +105,45 @@ export default function AgenceSidebar({ agence, bien }) {
           )}
         </div>
 
-        <button type="button" style={{ width: "100%", padding: "13px", borderRadius: 12, background: "#FF9500", color: "#fff", fontSize: 14, fontWeight: 700, border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, boxShadow: "0 4px 14px rgba(255,149,0,0.3)" }}>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
-          Contacter l'agence
+        {error && (
+          <div style={{ background: "rgba(220,38,38,0.06)", border: "1px solid rgba(220,38,38,0.25)", borderRadius: 10, padding: "10px 12px", marginBottom: 12, fontSize: 12, color: "#B91C1C", lineHeight: 1.5 }}>
+            ⚠️ {error}
+          </div>
+        )}
+
+        <button type="button" onClick={handleContactAgence} disabled={loading}
+          style={{
+            width: "100%",
+            padding: "13px",
+            borderRadius: 12,
+            background: loading ? "#FFB347" : "#FF9500",
+            color: "#fff",
+            fontSize: 14,
+            fontWeight: 700,
+            border: "none",
+            cursor: loading ? "wait" : "pointer",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 8,
+            boxShadow: "0 4px 14px rgba(255,149,0,0.3)",
+            transition: "all 0.15s ease",
+            opacity: loading ? 0.85 : 1,
+          }}>
+          {loading ? (
+            <>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ animation: "spin 1s linear infinite" }}>
+                <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
+              </svg>
+              <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
+              Ouverture...
+            </>
+          ) : (
+            <>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+              Contacter l'agence
+            </>
+          )}
         </button>
         <Link href="/dashboard/agence/catalogue"
           style={{ display: "block", textAlign: "center", marginTop: 10, padding: "11px", borderRadius: 12, background: "#fff", border: "1px solid #E8EDF2", color: "#002B54", fontSize: 13, fontWeight: 600, textDecoration: "none" }}>

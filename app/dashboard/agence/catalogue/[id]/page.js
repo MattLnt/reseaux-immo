@@ -17,6 +17,7 @@ export default async function BienDetailPage({ params }) {
     include: {
       agence: {
         select: {
+          id: true,
           nom: true,
           adresse: true,
           telephone: true,
