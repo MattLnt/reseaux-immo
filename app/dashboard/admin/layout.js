@@ -6,5 +6,5 @@ import AdminLayoutClient from "./AdminLayoutClient";
 export default async function DashboardAdminLayout({ children }) {
   const session = await getServerSession(authOptions);
   if (!session || session.user.role !== "ADMIN") redirect("/login");
-  return <AdminLayoutClient>{children}</AdminLayoutClient>;
+  return <AdminLayoutClient session={session}>{children}</AdminLayoutClient>;
 }
