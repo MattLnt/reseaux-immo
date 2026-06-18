@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import bcrypt from 'bcryptjs'
 import { prisma } from '@/lib/prisma'
+import { sendAgenceEnAttente, sendAdminNouvelleInscription } from '@/lib/emails'
 
 export async function POST(req) {
   try {
@@ -10,14 +11,14 @@ export async function POST(req) {
     if (!email || !password || !role) {
       return NextResponse.json({ message: 'Tous les champs sont requis' }, { status: 400 })
     }
-
     if (password.length < 9) {
       return NextResponse.json({ message: 'Le mot de passe doit faire au moins 9 caractères' }, { status: 400 })
     }
-
-    // Validation du rôle
     if (role !== 'AGENCE') {
       return NextResponse.json({ message: 'Rôle invalide' }, { status: 400 })
+    }
+    if (!nomAgence?.trim()) {
+      return NextResponse.json({ message: 'Le nom de l\'agence est requis' }, { status: 400 })
     }
 
     // Vérification email unique
@@ -37,21 +38,35 @@ export async function POST(req) {
         role: 'AGENCE',
         agence: {
           create: {
-            nom: nomAgence || '',
-            adresse: adresse || '',
-            telephone: telephone || '',
+            nom: nomAgence.trim(),
+            adresse: adresse?.trim() || '',
+            telephone: telephone?.trim() || '',
             email: email,
-            isActive: false, // En attente de validation admin
+            isActive: false,
           },
         },
       },
     })
 
-    // TODO: Envoyer email de confirmation (optionnel)
-    // try { await sendWelcomeAgence(email) } catch (e) { console.error('Email agence:', e) }
+    // Envoi des 2 emails — sans bloquer la réponse si Resend plante
+    Promise.allSettled([
+      sendAgenceEnAttente({ to: email, nomAgence: nomAgence.trim() }),
+      sendAdminNouvelleInscription({
+        nomAgence: nomAgence.trim(),
+        emailAgence: email,
+        telephoneAgence: telephone?.trim() || '',
+        adresseAgence: adresse?.trim() || '',
+      }),
+    ]).then((results) => {
+      results.forEach((r, i) => {
+        if (r.status === 'rejected') {
+          console.error(`[REGISTER] Email ${i} failed:`, r.reason)
+        }
+      })
+    })
 
-    return NextResponse.json({ 
-      message: 'Demande d\'inscription envoyée. Vous recevrez un email dès validation par un administrateur.' 
+    return NextResponse.json({
+      message: 'Demande d\'inscription envoyée. Vous recevrez un email dès validation par un administrateur.'
     }, { status: 201 })
 
   } catch (error) {

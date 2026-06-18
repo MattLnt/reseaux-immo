@@ -10,27 +10,51 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
+  const [errorType, setErrorType] = useState(""); // 'credentials' | 'pending'
   const [loading, setLoading] = useState(false);
 
   async function handleSubmit(e) {
     e.preventDefault();
     setLoading(true);
     setError("");
-    
+    setErrorType("");
+
     const res = await signIn("credentials", { email, password, redirect: false });
-    setLoading(false);
-    
-    if (res.error) {
-      setError("Email ou mot de passe incorrect");
-    } else {
-      await new Promise(resolve => setTimeout(resolve, 500));
-      const session = await fetch("/api/auth/session").then(r => r.json());
-      const role = session?.user?.role;
-      
-      if (role === "AGENCE") router.push("/dashboard/agence");
-      else if (role === "ADMIN") router.push("/dashboard/admin");
-      else router.push("/");
+
+    if (res?.error) {
+      // signIn() a échoué → on vérifie pourquoi
+      try {
+        const check = await fetch("/api/auth/check-account", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email }),
+        });
+        const data = await check.json();
+
+        if (data.status === "pending_or_disabled") {
+          setError("Votre compte n'est pas encore activé ou a été désactivé. Vous recevrez un email dès qu'un administrateur l'aura validé.");
+          setErrorType("pending");
+        } else {
+          setError("Email ou mot de passe incorrect");
+          setErrorType("credentials");
+        }
+      } catch {
+        setError("Email ou mot de passe incorrect");
+        setErrorType("credentials");
+      }
+
+      setLoading(false);
+      return;
     }
+
+    // Connexion réussie
+    await new Promise(resolve => setTimeout(resolve, 500));
+    const session = await fetch("/api/auth/session").then(r => r.json());
+    const role = session?.user?.role;
+
+    if (role === "AGENCE") router.push("/dashboard/agence");
+    else if (role === "ADMIN") router.push("/dashboard/admin");
+    else router.push("/");
   }
 
   const inputStyle = {
@@ -46,6 +70,11 @@ export default function LoginPage() {
     transition: "all 0.2s ease"
   };
 
+  // Couleurs de l'alerte selon le type d'erreur
+  const errorStyles = errorType === "pending"
+    ? { bg: "rgba(255,149,0,0.06)", border: "rgba(255,149,0,0.3)", color: "#CC7700" }
+    : { bg: "#FEF2F2", border: "#FECACA", color: "#DC2626" };
+
   return (
     <main style={{ minHeight: "100vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", background: "#002B54", padding: 20, position: "relative", overflow: "hidden" }}>
       <style>{`
@@ -56,12 +85,11 @@ export default function LoginPage() {
         }
       `}</style>
 
-      {/* Cercles décoratifs */}
       <div style={{ position: "absolute", top: "-100px", right: "-100px", width: 400, height: 400, borderRadius: "50%", background: "rgba(255,149,0,0.08)", pointerEvents: "none" }} />
       <div style={{ position: "absolute", bottom: "-100px", left: "-100px", width: 400, height: 400, borderRadius: "50%", background: "rgba(133,168,249,0.1)", pointerEvents: "none" }} />
 
       <div className="login-grid" style={{ width: "100%", maxWidth: 1100, display: "grid", gridTemplateColumns: "440px 1fr", gap: 32, alignItems: "center", position: "relative", zIndex: 1 }}>
-        
+
         {/* Colonne gauche : Formulaire */}
         <div style={{ background: "#FFFFFF", borderRadius: 20, padding: "32px 28px", boxShadow: "0 20px 60px rgba(0,0,0,0.25)" }}>
           <div style={{ textAlign: "center", marginBottom: 24 }}>
@@ -78,9 +106,15 @@ export default function LoginPage() {
           </div>
 
           {error && (
-            <div style={{ background: "#FEF2F2", border: "1px solid #FECACA", color: "#DC2626", fontSize: 12, borderRadius: 8, padding: "10px 12px", marginBottom: 16, display: "flex", alignItems: "center", gap: 6 }}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-              {error}
+            <div style={{ background: errorStyles.bg, border: `1px solid ${errorStyles.border}`, color: errorStyles.color, fontSize: 12, borderRadius: 8, padding: "12px 14px", marginBottom: 16, display: "flex", alignItems: "flex-start", gap: 8, lineHeight: 1.5 }}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ flexShrink: 0, marginTop: 1 }}>
+                {errorType === "pending" ? (
+                  <><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></>
+                ) : (
+                  <><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></>
+                )}
+              </svg>
+              <span>{error}</span>
             </div>
           )}
 
