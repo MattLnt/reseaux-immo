@@ -8,6 +8,7 @@ const ICONS = {
   euro: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 10h12"/><path d="M4 14h9"/><path d="M19 6a7.7 7.7 0 00-5.2-2A7.9 7.9 0 006 12c0 4.4 3.5 8 7.8 8a7.7 7.7 0 005.2-2"/></svg>,
   archive: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>,
   wallet: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 8h1a4 4 0 010 8h-1M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8z"/></svg>,
+  acheteur: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>,
 };
 
 // Configurations des cartes par variant
@@ -23,6 +24,12 @@ const VARIANTS = {
     { title: "En ligne", value: stats.actifs, color: "lightblue", icon: ICONS.check },
     { title: "Archivés", value: stats.archives, color: "orange", icon: ICONS.archive },
     { title: "Valeur portefeuille", value: stats.valeur, color: "lightblue", icon: ICONS.wallet },
+  ],
+  acheteurs: (stats) => [
+    { title: "Acheteurs disponibles", value: stats.total, color: "orange", icon: ICONS.acheteur },
+    { title: "Actifs", value: stats.actifs, color: "lightblue", icon: ICONS.check },
+    { title: "Agences", value: stats.agences, color: "orange", icon: ICONS.users },
+    { title: "Budget moyen", value: stats.budgetMoyen, color: "lightblue", icon: ICONS.wallet },
   ],
 };
 
@@ -41,7 +48,7 @@ export default function BannerStats({ title, stats, variant = "dashboard" }) {
       <h1 style={{ fontSize: 32, fontWeight: 700, color: '#FFFFFF', margin: '0 0 24px', letterSpacing: '-0.02em' }}>
         {title}
       </h1>
-      
+
       <div className="stats-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 20 }}>
         {cards.map((card, i) => (
           <StatCard

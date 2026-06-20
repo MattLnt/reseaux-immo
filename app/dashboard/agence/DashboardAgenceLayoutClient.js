@@ -31,7 +31,16 @@ export default function DashboardAgenceLayoutClient({ children, session }) {
         { href: '/dashboard/agence', label: 'Tableau de bord', shortLabel: 'Dashboard', icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg> },
         { href: '/dashboard/agence/mes-biens', label: 'Mes biens', shortLabel: 'Mes biens', icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg> },
         { href: '/dashboard/agence/mes-acheteurs', label: 'Mes acheteurs', shortLabel: 'Acheteurs', icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg> },
-        { href: '/dashboard/agence/catalogue', label: 'Catalogue', shortLabel: 'Catalogue', icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg> },
+        {
+          label: 'Catalogue',
+          shortLabel: 'Catalogue',
+          isGroup: true,
+          icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>,
+          children: [
+            { href: '/dashboard/agence/catalogue', label: 'Biens', shortLabel: 'Biens', icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg> },
+            { href: '/dashboard/agence/catalogue-acheteurs', label: 'Acheteurs', shortLabel: 'Acheteurs', icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg> },
+          ],
+        },
       ]
     },
     {
@@ -50,7 +59,8 @@ export default function DashboardAgenceLayoutClient({ children, session }) {
     },
   ]
 
-  const allItems = menuItems.flatMap(g => g.items)
+  // Pour la bottom nav mobile : on aplatit les groupes en remplaçant le groupe Catalogue par ses 2 enfants
+  const allItems = menuItems.flatMap(g => g.items.flatMap(item => item.isGroup ? item.children : [item]))
 
   return (
     <div style={{ display: 'flex', minHeight: '100vh', background: '#EAEAEA' }}>
@@ -93,6 +103,32 @@ export default function DashboardAgenceLayoutClient({ children, session }) {
             <div key={group.section} style={{ marginBottom: 24 }}>
               {!collapsed && <div style={{ fontSize: 10, fontWeight: 600, color: 'rgba(255,255,255,0.4)', letterSpacing: '0.1em', padding: '0 8px', marginBottom: 6 }}>{group.section}</div>}
               {group.items.map((item) => {
+                // Cas spécial : groupe avec sous-menu (Catalogue → Biens / Acheteurs)
+                if (item.isGroup) {
+                  const isGroupActive = item.children.some(c => pathname === c.href || pathname.startsWith(c.href + '/'))
+                  return (
+                    <div key={item.label} style={{ marginBottom: 2 }}>
+                      {/* Tête du groupe (non cliquable) */}
+                      <div title={collapsed ? item.label : ''}
+                        style={{ display: 'flex', alignItems: 'center', gap: collapsed ? 0 : 10, justifyContent: collapsed ? 'center' : 'flex-start', padding: collapsed ? '10px 0' : '9px 10px', borderRadius: 8, color: isGroupActive ? '#FF9500' : 'rgba(255,255,255,0.6)', fontWeight: isGroupActive ? 600 : 400, fontSize: 13 }}>
+                        <span style={{ flexShrink: 0, display: 'flex', color: isGroupActive ? '#FF9500' : 'rgba(255,255,255,0.5)' }}>{item.icon}</span>
+                        {!collapsed && <span style={{ flex: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{item.label}</span>}
+                      </div>
+                      {/* Sous-items */}
+                      {!collapsed && item.children.map((child) => {
+                        const isChildActive = pathname === child.href
+                        return (
+                          <Link key={child.href} href={child.href} className="agence-nav-item"
+                            style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '7px 10px 7px 30px', borderRadius: 8, marginBottom: 1, textDecoration: 'none', background: isChildActive ? 'rgba(255, 149, 0, 0.15)' : 'transparent', color: isChildActive ? '#FF9500' : 'rgba(255,255,255,0.55)', fontWeight: isChildActive ? 600 : 400, fontSize: 12, transition: 'all 0.15s ease', borderLeft: isChildActive ? '2px solid #FF9500' : '2px solid transparent' }}>
+                            <span style={{ flexShrink: 0, display: 'flex', color: isChildActive ? '#FF9500' : 'rgba(255,255,255,0.4)' }}>{child.icon}</span>
+                            <span style={{ flex: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{child.label}</span>
+                          </Link>
+                        )
+                      })}
+                    </div>
+                  )
+                }
+                // Item simple (cas normal)
                 const isActive = pathname === item.href
                 return (
                   <Link key={item.href} href={item.href} className="agence-nav-item" title={collapsed ? item.label : ''}
@@ -139,11 +175,11 @@ export default function DashboardAgenceLayoutClient({ children, session }) {
             )
           })}
           <button onClick={() => signOut({ callbackUrl: '/login' })} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3, background: 'none', border: 'none', cursor: 'pointer', padding: '6px 10px', flexShrink: 0, minWidth: 52 }}>
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.4)" strokeWidth="1.5"><path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
-                      <span style={{ fontSize: 9, color: 'rgba(255,255,255,0.4)' }}>Quitter</span>
-                    </button>
-                  </div>
-                </div>
-              </div>
-            )
-          }
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.4)" strokeWidth="1.5"><path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+            <span style={{ fontSize: 9, color: 'rgba(255,255,255,0.4)' }}>Quitter</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
