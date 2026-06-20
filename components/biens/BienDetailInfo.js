@@ -1,3 +1,28 @@
+// Configurations des badges de statut
+const STATUT_CONFIG = {
+  ACTIF: {
+    label: "En vente",
+    color: "#10B981",
+    bg: "rgba(16,185,129,0.1)",
+    border: "rgba(16,185,129,0.25)",
+    dot: "#10B981",
+  },
+  SOUS_OPTION: {
+    label: "Sous option",
+    color: "#F59E0B",
+    bg: "rgba(245,158,11,0.1)",
+    border: "rgba(245,158,11,0.25)",
+    dot: "#F59E0B",
+  },
+  VENDU: {
+    label: "Vendu",
+    color: "#9CA3AF",
+    bg: "rgba(156,163,175,0.1)",
+    border: "rgba(156,163,175,0.25)",
+    dot: "#9CA3AF",
+  },
+};
+
 export default function BienDetailInfo({ bien }) {
   const stats = [
     {
@@ -22,6 +47,8 @@ export default function BienDetailInfo({ bien }) {
     }] : [])
   ];
 
+  const statutConfig = STATUT_CONFIG[bien.statut] || STATUT_CONFIG.ACTIF;
+
   return (
     <div style={{ background: "#FFFFFF", borderRadius: 16, border: "1px solid #E8EDF2", padding: 28 }}>
       <div style={{ marginBottom: 24 }}>
@@ -29,6 +56,23 @@ export default function BienDetailInfo({ bien }) {
           {bien.localisation}
         </h1>
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+          {/* Badge statut — en premier pour le mettre en avant */}
+          <span style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 6,
+            fontSize: 12,
+            fontWeight: 700,
+            color: statutConfig.color,
+            background: statutConfig.bg,
+            border: `1px solid ${statutConfig.border}`,
+            padding: "4px 12px",
+            borderRadius: 20,
+          }}>
+            <span style={{ width: 6, height: 6, borderRadius: "50%", background: statutConfig.dot }} />
+            {statutConfig.label}
+          </span>
+
           <span style={{ fontSize: 12, fontWeight: 700, color: "#FF9500", background: "rgba(255,149,0,0.1)", border: "1px solid rgba(255,149,0,0.2)", padding: "4px 12px", borderRadius: 20 }}>
             {bien.typeBien}
           </span>

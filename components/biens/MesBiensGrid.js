@@ -1,8 +1,16 @@
 import MesBiensCard from './MesBiensCard';
 import Link from 'next/link';
 
+const STATUT_EMPTY_LABELS = {
+  ACTIF: { title: "Aucun bien en vente", desc: "Commencez par ajouter votre premier mandat" },
+  SOUS_OPTION: { title: "Aucun bien sous option", desc: "Les biens en cours de négociation apparaîtront ici" },
+  VENDU: { title: "Aucun bien vendu", desc: "L'historique de vos ventes apparaîtra ici" },
+  ARCHIVE: { title: "Aucun bien archivé", desc: "Les biens archivés apparaîtront ici" },
+};
+
 export default function MesBiensGrid({ biens, statut }) {
   if (biens.length === 0) {
+    const empty = STATUT_EMPTY_LABELS[statut] || STATUT_EMPTY_LABELS.ACTIF;
     return (
       <div style={{ background: '#FFFFFF', borderRadius: 16, border: '1px solid #E8EDF2', padding: '60px 24px', textAlign: 'center' }}>
         <div style={{ width: 64, height: 64, borderRadius: 12, background: 'rgba(255,149,0,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px', color: '#FF9500' }}>
@@ -12,12 +20,10 @@ export default function MesBiensGrid({ biens, statut }) {
           </svg>
         </div>
         <h2 style={{ fontSize: 18, fontWeight: 700, color: '#002B54', margin: '0 0 8px' }}>
-          Aucun bien {statut === 'ACTIF' ? 'actif' : 'archivé'}
+          {empty.title}
         </h2>
         <p style={{ fontSize: 14, color: '#5A6B7D', margin: '0 0 24px', maxWidth: 400, marginLeft: 'auto', marginRight: 'auto' }}>
-          {statut === 'ACTIF' 
-            ? "Commencez par ajouter votre premier mandat exclusif"
-            : "Les biens archivés apparaîtront ici"}
+          {empty.desc}
         </p>
         {statut === 'ACTIF' && (
           <Link href="/dashboard/agence/mes-biens/nouveau" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: '#FF9500', color: '#FFFFFF', padding: '12px 24px', borderRadius: 8, fontSize: 14, fontWeight: 600, textDecoration: 'none' }}>
@@ -39,7 +45,7 @@ export default function MesBiensGrid({ biens, statut }) {
           .mes-biens-grid { grid-template-columns: 1fr !important; }
         }
       `}</style>
-      
+
       <div className="mes-biens-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 20 }}>
         {biens.map((bien) => (
           <MesBiensCard key={bien.id} bien={bien} statut={statut} />

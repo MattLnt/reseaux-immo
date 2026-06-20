@@ -13,6 +13,9 @@ export default function AgenceSidebar({ agence, bien }) {
   const montantRetrocede = commissionTotale * (part / 100);
   const fmt = (n) => Math.round(n).toLocaleString("fr-BE");
 
+  // Nom complet du contact référent (si fourni)
+  const nomComplet = [agence.prenomContact, agence.nomContact].filter(Boolean).join(" ");
+
   async function handleContactAgence() {
     setLoading(true);
     setError("");
@@ -26,7 +29,6 @@ export default function AgenceSidebar({ agence, bien }) {
       if (!res.ok) {
         throw new Error(data.error || "Impossible de démarrer la conversation");
       }
-      // Redirection vers la messagerie avec la conv sélectionnée
       router.push(`/dashboard/agence/messages?conv=${data.id}`);
     } catch (err) {
       setError(err.message);
@@ -59,14 +61,14 @@ export default function AgenceSidebar({ agence, bien }) {
         </div>
       </div>
 
-      {/* Carte rétrocession — la mise en avant */}
+      {/* Carte rétrocession */}
       <div style={{ background: "#FFFFFF", borderRadius: 16, border: "2px solid #FF9500", padding: "22px 24px", position: "relative", overflow: "hidden" }}>
         <div style={{ position: "absolute", top: 0, right: 0, background: "#FF9500", color: "#fff", fontSize: 10, fontWeight: 700, padding: "4px 12px", borderBottomLeftRadius: 10, letterSpacing: "0.04em" }}>
           POUR VOUS
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
           <div style={{ width: 32, height: 32, borderRadius: 9, background: "rgba(255,149,0,0.12)", display: "flex", alignItems: "center", justifyContent: "center", color: "#FF9500" }}>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 10h12"/><path d="M4 14h9"/><path d="M19 6a7.7 7.7 0 00-5.2-2A7.9 7.9 0 006 12c0 4.4 3.5 8 7.8 8a7.7 7.7 0 005.2-2"/></svg>
           </div>
           <span style={{ fontSize: 13, fontWeight: 700, color: "#002B54" }}>Si vous apportez l'acheteur</span>
         </div>
@@ -91,6 +93,18 @@ export default function AgenceSidebar({ agence, bien }) {
         </div>
 
         <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 18 }}>
+          {agence.numeroIPI && (
+            <div>
+              <div style={{ fontSize: 10, color: "#9CA3AF", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 3 }}>Numéro IPI</div>
+              <div style={{ fontSize: 14, fontWeight: 700, color: "#002B54" }}>{agence.numeroIPI}</div>
+            </div>
+          )}
+          {nomComplet && (
+            <div>
+              <div style={{ fontSize: 10, color: "#9CA3AF", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 3 }}>Contact référent</div>
+              <div style={{ fontSize: 14, fontWeight: 700, color: "#002B54" }}>{nomComplet}</div>
+            </div>
+          )}
           {agence.telephone && (
             <div>
               <div style={{ fontSize: 10, color: "#9CA3AF", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 3 }}>Téléphone</div>

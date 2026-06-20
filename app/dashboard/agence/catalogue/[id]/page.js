@@ -21,13 +21,18 @@ export default async function BienDetailPage({ params }) {
           nom: true,
           adresse: true,
           telephone: true,
-          email: true
+          email: true,
+          numeroIPI: true,
+          prenomContact: true,
+          nomContact: true,
         }
       }
     }
   });
 
-  if (!bien || bien.statut !== 'ACTIF' || bien.agenceId === session.user.agenceId) {
+  // Visible si actif OU sous option (pas si vendu/archivé/supprimé) + pas mon bien
+  const statutsVisibles = ['ACTIF', 'SOUS_OPTION'];
+  if (!bien || !statutsVisibles.includes(bien.statut) || bien.agenceId === session.user.agenceId) {
     redirect('/dashboard/agence/catalogue');
   }
 

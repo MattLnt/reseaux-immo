@@ -154,7 +154,7 @@ export default function BienCard({ bien }) {
           <div style={{ background: 'rgba(255,149,0,0.08)', border: '1px solid rgba(255,149,0,0.25)', borderRadius: 12, padding: '12px 14px', marginBottom: 16 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#FF9500" strokeWidth="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#FF9500" strokeWidth="2"><path d="M4 10h12"/><path d="M4 14h9"/><path d="M19 6a7.7 7.7 0 00-5.2-2A7.9 7.9 0 006 12c0 4.4 3.5 8 7.8 8a7.7 7.7 0 005.2-2"/></svg>
                 <span style={{ fontSize: 12, color: '#5A6B7D', fontWeight: 600 }}>Si vous apportez l'acheteur</span>
               </div>
               <span style={{ fontSize: 16, fontWeight: 700, color: '#FF9500' }}>{fmt(montantRetrocede)} €</span>

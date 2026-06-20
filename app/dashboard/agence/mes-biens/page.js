@@ -11,6 +11,7 @@ export default async function MesBiensPage({ searchParams }) {
   const params = await searchParams;
   const statut = params?.statut || 'ACTIF';
 
+  // Biens du statut courant (pour la grille)
   const biens = await prisma.bien.findMany({
     where: {
       agenceId: session.user.agenceId,
@@ -19,30 +20,42 @@ export default async function MesBiensPage({ searchParams }) {
     orderBy: { createdAt: 'desc' }
   });
 
-  // Tous les biens de l'agence (pour les stats)
+  // Tous les biens de l'agence (pour stats + compteurs onglets)
   const tousBiens = await prisma.bien.findMany({
     where: { agenceId: session.user.agenceId },
     select: { statut: true, prix: true }
   });
 
-  const actifCount = tousBiens.filter(b => b.statut === 'ACTIF').length;
-  const archiveCount = tousBiens.filter(b => b.statut === 'ARCHIVE').length;
+  // Compteurs par statut (passés à StatutTabs)
+  const counts = tousBiens.reduce((acc, b) => {
+    acc[b.statut] = (acc[b.statut] || 0) + 1;
+    return acc;
+  }, {});
+
+  // Stats globales pour la bannière
+  const totalAffiche = (counts.ACTIF || 0) + (counts.SOUS_OPTION || 0);
   const valeurTotale = tousBiens.reduce((sum, b) => sum + b.prix, 0);
 
-  // Formatage de la valeur (ex: 1.2M, 850k)
   const formatValeur = (val) => {
     if (val >= 1000000) return `${(val / 1000000).toFixed(1)}M €`;
     if (val >= 1000) return `${Math.round(val / 1000)}k €`;
     return `${val} €`;
   };
 
-  // Stats pour la bannière
   const bannerStats = {
-    total: actifCount + archiveCount,
-    actifs: actifCount,
-    archives: archiveCount,
+    total: tousBiens.length,
+    actifs: totalAffiche,
+    archives: counts.ARCHIVE || 0,
     valeur: formatValeur(valeurTotale)
   };
+
+  // Texte du sous-titre selon le statut courant
+  const labelStatut = {
+    ACTIF: 'en vente',
+    SOUS_OPTION: 'sous option',
+    VENDU: 'vendu(s)',
+    ARCHIVE: 'archivé(s)',
+  }[statut] || '';
 
   return (
     <div style={{ maxWidth: "100%", margin: "-36px -40px" }}>
@@ -57,12 +70,12 @@ export default async function MesBiensPage({ searchParams }) {
       </div>
 
       <div style={{ padding: "0 40px 40px" }}>
-        
+
         {/* Header avec bouton */}
         <div className="mes-biens-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
           <div>
             <p style={{ fontSize: 14, color: '#5A6B7D', margin: 0 }}>
-              {biens.length} bien{biens.length > 1 ? 's' : ''} {statut === 'ACTIF' ? 'en ligne' : 'archivé(s)'}
+              {biens.length} bien{biens.length > 1 ? 's' : ''} {labelStatut}
             </p>
           </div>
           <Link href="/dashboard/agence/mes-biens/nouveau"
@@ -75,11 +88,10 @@ export default async function MesBiensPage({ searchParams }) {
           </Link>
         </div>
 
-        {/* Tabs Actifs/Archivés */}
-        <StatutTabs 
-          currentStatut={statut} 
-          actifCount={actifCount} 
-          archiveCount={archiveCount}
+        {/* Tabs 4 statuts */}
+        <StatutTabs
+          currentStatut={statut}
+          counts={counts}
           baseUrl="/dashboard/agence/mes-biens"
         />
 
