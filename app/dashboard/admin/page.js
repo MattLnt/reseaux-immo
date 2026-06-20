@@ -36,7 +36,7 @@ export default async function DashboardAdminPage() {
           Tableau de bord administrateur
         </h1>
         <p style={{ fontSize: 14, color: "#5A6B7D", margin: 0 }}>
-          Vue globale de la plateforme Réseaux Immo.
+          Vue globale de la plateforme OnShare.
         </p>
       </div>
 
@@ -77,7 +77,7 @@ export default async function DashboardAdminPage() {
       <div style={{ background: "#FFFFFF", borderRadius: 16, border: "1px solid #E8EDF2", padding: 24 }}>
         <h2 style={{ fontSize: 16, fontWeight: 700, color: "#002B54", margin: "0 0 12px" }}>Gestion des agences</h2>
         <p style={{ fontSize: 13, color: "#5A6B7D", margin: "0 0 18px", lineHeight: 1.6 }}>
-          La page de gestion détaillée des agences (validation, désactivation, filtres) est en cours de finalisation.
+          Validez les inscriptions, gérez les comptes actifs et désactivez les agences depuis l'espace dédié.
         </p>
         <Link href="/dashboard/admin/agences"
           style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "11px 20px", borderRadius: 10, background: "#001B38", color: "#fff", fontSize: 13, fontWeight: 700, textDecoration: "none" }}>

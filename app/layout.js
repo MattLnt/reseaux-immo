@@ -5,8 +5,11 @@ import Providers from './components/Providers'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata = {
-  title: 'Réseaux Immo — Le réseau de co-courtage immobilier',
-  description: 'Le réseau privé qui connecte les agences immobilières belges.',
+  title: 'OnShare — Le réseau qui connecte les agences immobilières',
+  description: "Le réseau privé qui connecte les agences immobilières. Partagez vos mandats, trouvez des acheteurs, concluez plus de ventes.",
+  icons: {
+    icon: '/logo.svg',
+  },
 }
 
 export default function RootLayout({ children }) {

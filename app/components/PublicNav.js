@@ -29,8 +29,10 @@ export default function PublicNav({ dark = false }) {
     ? scrolled ? "rgba(255,255,255,0.08)" : "transparent"
     : scrolled ? "rgba(0,0,0,0.06)" : "transparent";
 
-  const logo = dark ? "#fff" : "#002B54";
   const links = dark ? "rgba(255,255,255,0.75)" : "#5A6B7D";
+
+  // Logo : version white sur fond sombre (mode dark OU menu mobile ouvert), version standard sinon
+  const logoSrc = (dark || menuOpen) ? "/logo-white.svg" : "/logo.svg";
 
   const dashboardHref = session?.user?.role === "ADMIN"
     ? "/dashboard/admin"
@@ -73,8 +75,8 @@ export default function PublicNav({ dark = false }) {
         transition: "background 0.4s ease, border-color 0.3s ease",
       }}>
         <Link href="/" onClick={() => setMenuOpen(false)}
-          style={{ fontSize: 18, fontWeight: 700, color: menuOpen ? "#fff" : logo, letterSpacing: "-0.02em", textDecoration: "none", transition: "color 0.3s", zIndex: 201 }}>
-          Réseaux <span style={{ color: "#FF9500" }}>Immo</span>
+          style={{ display: "flex", alignItems: "center", textDecoration: "none", zIndex: 201, height: 40 }}>
+          <img src={logoSrc} alt="OnShare" style={{ height: 68, width: "auto", display: "block", transition: "opacity 0.3s ease" }} />
         </Link>
 
         {/* Desktop */}
@@ -175,7 +177,7 @@ export default function PublicNav({ dark = false }) {
           </div>
 
           <div style={{ padding: "20px 28px 40px", borderTop: "1px solid rgba(255,255,255,0.06)", display: "flex", justifyContent: "space-between", alignItems: "center", position: "relative", zIndex: 1 }}>
-            <p style={{ fontSize: 12, color: "rgba(255,255,255,0.4)", margin: 0 }}>© 2026 Réseaux Immo</p>
+            <p style={{ fontSize: 12, color: "rgba(255,255,255,0.4)", margin: 0 }}>© 2026 OnShare</p>
             <div style={{ display: "flex", gap: 20 }}>
               <Link href="/cgv" onClick={() => setMenuOpen(false)} style={{ fontSize: 12, color: "rgba(255,255,255,0.5)", textDecoration: "none" }}>CGV</Link>
               <Link href="/contact" onClick={() => setMenuOpen(false)} style={{ fontSize: 12, color: "rgba(255,255,255,0.5)", textDecoration: "none" }}>Contact</Link>

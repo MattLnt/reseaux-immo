@@ -1,6 +1,7 @@
 import Link from "next/link";
 import PublicNav from "./components/PublicNav";
 import PublicFooter from "./components/PublicFooter";
+import DashboardMockup from "./components/DashboardMockup";
 
 export default function HomePage() {
   return (
@@ -12,7 +13,6 @@ export default function HomePage() {
           .hero-section { padding: 120px 24px 80px !important; }
           .hero-title { font-size: 42px !important; }
           .hero-subtitle { font-size: 18px !important; }
-          .grid-4 { grid-template-columns: 1fr 1fr !important; gap: 16px !important; }
           .grid-3 { grid-template-columns: 1fr !important; gap: 24px !important; }
           .grid-2 { grid-template-columns: 1fr !important; gap: 40px !important; }
           .section-padding { padding: 80px 24px !important; }
@@ -25,22 +25,32 @@ export default function HomePage() {
 
       <main>
 
-        {/* Hero */}
-        <div className="hero-section" style={{ paddingTop: 180, paddingBottom: 120, background: "linear-gradient(180deg, #FFFFFF 0%, #FAFDFD 100%)" }}>
-          <div style={{ maxWidth: 1400, margin: "0 auto", padding: "0 48px" }}>
+        {/* Hero — avec dégradé subtil et halo orange */}
+        <div className="hero-section" style={{
+          paddingTop: 180,
+          paddingBottom: 120,
+          background: "linear-gradient(180deg, #FAFDFD 0%, #FFFFFF 60%, #FAFDFD 100%)",
+          position: "relative",
+          overflow: "hidden",
+        }}>
+          {/* Halos décoratifs */}
+          <div style={{ position: "absolute", top: -200, left: "-10%", width: 600, height: 600, borderRadius: "50%", background: "radial-gradient(ellipse, rgba(255,149,0,0.08) 0%, transparent 70%)", pointerEvents: "none" }} />
+          <div style={{ position: "absolute", top: 100, right: "-10%", width: 500, height: 500, borderRadius: "50%", background: "radial-gradient(ellipse, rgba(133,168,249,0.1) 0%, transparent 70%)", pointerEvents: "none" }} />
+
+          <div style={{ maxWidth: 1400, margin: "0 auto", padding: "0 48px", position: "relative", zIndex: 1 }}>
             <div className="fade-in" style={{ textAlign: "center", marginBottom: 80 }}>
-              
+
               <div style={{ display: "inline-flex", alignItems: "center", gap: 10, background: "rgba(255,149,0,0.1)", border: "1px solid rgba(255,149,0,0.25)", borderRadius: 24, padding: "8px 20px", marginBottom: 40 }}>
                 <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#FF9500" }} />
-                <span style={{ fontSize: 12, fontWeight: 600, color: "#CC7700", letterSpacing: "0.05em" }}>RÉSEAU PRIVÉ • BELGIQUE</span>
+                <span style={{ fontSize: 12, fontWeight: 600, color: "#CC7700", letterSpacing: "0.05em" }}>RÉSEAU PRIVÉ</span>
               </div>
 
               <h1 className="hero-title" style={{ fontSize: 72, fontWeight: 600, color: "#002B54", lineHeight: 1.05, margin: "0 0 32px", letterSpacing: "-0.04em", maxWidth: 1100, marginLeft: "auto", marginRight: "auto" }}>
                 Vendez vos biens<br />à plusieurs agences
               </h1>
-              
+
               <p className="hero-subtitle" style={{ fontSize: 22, color: "#5A6B7D", lineHeight: 1.6, maxWidth: 720, margin: "0 auto 56px", fontWeight: 400 }}>
-                Le réseau de co-courtage qui connecte les agences immobilières belges. Partagez vos mandats, trouvez des acheteurs, concluez plus de ventes.
+                Le réseau qui connecte les agences immobilières. Partagez vos mandats, trouvez des acheteurs, concluez plus de ventes.
               </p>
 
               <div style={{ display: "flex", gap: 16, justifyContent: "center", flexWrap: "wrap", marginBottom: 100 }}>
@@ -55,37 +65,10 @@ export default function HomePage() {
                 </Link>
               </div>
 
-              {/* Hero image */}
-              <div style={{ maxWidth: 1200, margin: "0 auto", borderRadius: 20, overflow: "hidden", boxShadow: "0 20px 60px rgba(0,43,84,0.12)", border: "1px solid #E8EDF2" }}>
-                <img 
-                  src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1200&h=675&fit=crop" 
-                  alt="Dashboard" 
-                  style={{ width: "100%", height: "auto", display: "block" }} 
-                />
+              {/* Hero — Mockup du vrai dashboard */}
+              <div style={{ maxWidth: 1200, margin: "0 auto" }}>
+                <DashboardMockup />
               </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Stats — fond foncé */}
-        <div style={{ padding: "80px 48px", background: "#002B54" }}>
-          <div style={{ maxWidth: 1400, margin: "0 auto" }}>
-            <div className="grid-4" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 32 }}>
-              {[
-                { value: "150+", label: "Agences partenaires" },
-                { value: "2,500+", label: "Biens partagés" },
-                { value: "500+", label: "Ventes réalisées" },
-                { value: "9 provinces", label: "Couverture nationale" },
-              ].map((stat, i) => (
-                <div key={i} style={{ textAlign: "center" }}>
-                  <div style={{ fontSize: 48, fontWeight: 600, color: "#FF9500", marginBottom: 12, letterSpacing: "-0.02em" }}>
-                    {stat.value}
-                  </div>
-                  <div style={{ fontSize: 15, color: "rgba(255,255,255,0.7)", fontWeight: 500 }}>
-                    {stat.label}
-                  </div>
-                </div>
-              ))}
             </div>
           </div>
         </div>
@@ -98,8 +81,8 @@ export default function HomePage() {
               <h2 className="home-h2" style={{ fontSize: 48, fontWeight: 600, color: "#002B54", margin: "0 0 20px", letterSpacing: "-0.03em" }}>
                 Deux agences, une vente
               </h2>
-              <p style={{ fontSize: 19, color: "#5A6B7D", maxWidth: 640, margin: "0 auto", lineHeight: 1.6 }}>
-                Vous n'arrivez pas à vendre un bien seul ? Une autre agence a peut-être l'acheteur. Tout le monde y gagne.
+              <p style={{ fontSize: 19, color: "#5A6B7D", maxWidth: 720, margin: "0 auto", lineHeight: 1.6 }}>
+                Vous souhaitez vendre plus vite ? Une autre agence a peut-être l'acheteur. Tout le monde y gagne.
               </p>
             </div>
 
@@ -113,7 +96,7 @@ export default function HomePage() {
                   Encodez le bien
                 </h3>
                 <p style={{ fontSize: 15, color: "#5A6B7D", lineHeight: 1.7, margin: "0 0 20px" }}>
-                  Vous avez le mandat exclusif d'un bien. Encodez-le sur la plateforme avec photos, détails et le taux de commission que vous offrez à l'agence qui vous apportera un acheteur.
+                  Vous avez le mandat d'un bien. Encodez-le sur la plateforme avec photos, détails et le taux de commission que vous offrez à l'agence qui vous apportera un acheteur.
                 </p>
                 <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                   {["Vous gardez le contact avec le vendeur", "Vous fixez votre taux de commission", "Vous recevez les acheteurs des autres agences"].map((t, i) => (
@@ -236,8 +219,8 @@ export default function HomePage() {
                 },
                 {
                   icon: <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#002B54" strokeWidth="1.5"><path d="M18 8h1a4 4 0 010 8h-1M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8z"/></svg>,
-                  title: "Gestion des contacts",
-                  desc: "Suivez chaque contact : signé, en cours, etc."
+                  title: "Encodage acheteurs",
+                  desc: "Centralisez vos acheteurs potentiels et leurs critères"
                 },
                 {
                   icon: <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#002B54" strokeWidth="1.5"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>,
@@ -271,7 +254,7 @@ export default function HomePage() {
                   Un réseau privé et de confiance
                 </h2>
                 <p style={{ fontSize: 18, color: "rgba(255,255,255,0.7)", lineHeight: 1.7, marginBottom: 40 }}>
-                  Rejoignez un réseau exclusif d'agences immobilières belges vérifiées. Chaque inscription est validée manuellement. Vos biens ne sont jamais visibles par le grand public.
+                  Rejoignez un réseau exclusif d'agences immobilières vérifiées. Chaque inscription est validée manuellement. Vos biens ne sont jamais visibles par le grand public.
                 </p>
                 <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
                   {[
@@ -291,10 +274,10 @@ export default function HomePage() {
                 </div>
               </div>
               <div style={{ borderRadius: 20, overflow: "hidden", border: "1px solid rgba(255,255,255,0.1)" }}>
-                <img 
-                  src="https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=600&h=500&fit=crop" 
-                  alt="Réseau" 
-                  style={{ width: "100%", height: "auto", display: "block" }} 
+                <img
+                  src="https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=600&h=500&fit=crop"
+                  alt="Réseau"
+                  style={{ width: "100%", height: "auto", display: "block" }}
                 />
               </div>
             </div>
@@ -304,7 +287,7 @@ export default function HomePage() {
         {/* Tarif */}
         <div className="section-padding" style={{ padding: "120px 48px", background: "#FFFFFF" }}>
           <div style={{ maxWidth: 760, margin: "0 auto", textAlign: "center" }}>
-            <p style={{ fontSize: 12, fontWeight: 600, color: "#CC7700", letterSpacing: "0.1em", margin: "0 0 16px", textTransform: "uppercase" }}>Tarif unique</p>
+            <p style={{ fontSize: 12, fontWeight: 600, color: "#CC7700", letterSpacing: "0.1em", margin: "0 0 16px", textTransform: "uppercase" }}>Offre de lancement</p>
             <h2 className="home-h2" style={{ fontSize: 48, fontWeight: 600, color: "#002B54", margin: "0 0 20px", letterSpacing: "-0.03em" }}>
               Un seul abonnement, tout inclus
             </h2>
@@ -312,10 +295,10 @@ export default function HomePage() {
               Pas de plans compliqués, aucune commission prélevée par la plateforme.
             </p>
             <div style={{ display: "inline-flex", alignItems: "baseline", gap: 8, marginBottom: 8 }}>
-              <span style={{ fontSize: 72, fontWeight: 700, color: "#002B54", letterSpacing: "-0.04em" }}>299 €</span>
+              <span style={{ fontSize: 72, fontWeight: 700, color: "#002B54", letterSpacing: "-0.04em" }}>150 €</span>
               <span style={{ fontSize: 20, color: "#9CA3AF" }}>/mois HTVA</span>
             </div>
-            <p style={{ fontSize: 14, color: "#9CA3AF", margin: "0 0 32px" }}>Sans engagement · Résiliable à tout moment</p>
+            <p style={{ fontSize: 14, color: "#9CA3AF", margin: "0 0 32px" }}>Offre de lancement</p>
             <div>
               <Link href="/tarifs" style={{ display: "inline-flex", alignItems: "center", gap: 10, background: "#FF9500", color: "#FFFFFF", padding: "16px 36px", borderRadius: 10, fontSize: 16, fontWeight: 600, textDecoration: "none", boxShadow: "0 4px 14px rgba(255,149,0,0.3)" }}>
                 Voir le détail de l'offre
@@ -325,60 +308,8 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* Témoignages */}
-        <div id="temoignages" className="section-padding" style={{ padding: "120px 48px", background: "#FAFDFD", borderTop: "1px solid #E8EDF2" }}>
-          <div style={{ maxWidth: 1400, margin: "0 auto" }}>
-            <div style={{ textAlign: "center", marginBottom: 80 }}>
-              <p style={{ fontSize: 12, fontWeight: 600, color: "#CC7700", letterSpacing: "0.1em", margin: "0 0 16px", textTransform: "uppercase" }}>Témoignages</p>
-              <h2 className="home-h2" style={{ fontSize: 48, fontWeight: 600, color: "#002B54", margin: "0" }}>
-                Ce qu'en disent les agences
-              </h2>
-            </div>
-
-            <div className="grid-3" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 32 }}>
-              {[
-                {
-                  text: "Réseaux Immo nous a permis de vendre 3 biens en 2 mois. Le réseau est vraiment actif.",
-                  author: "Sophie M.",
-                  role: "Agence Bruxelles",
-                  img: "https://i.pravatar.cc/150?img=1"
-                },
-                {
-                  text: "Interface claire, alertes efficaces. On gagne un temps fou.",
-                  author: "Thomas D.",
-                  role: "Agence Liège",
-                  img: "https://i.pravatar.cc/150?img=12"
-                },
-                {
-                  text: "Pouvoir proposer les biens d'autres agences à mes clients, ça change tout.",
-                  author: "Marie L.",
-                  role: "Agence Anvers",
-                  img: "https://i.pravatar.cc/150?img=5"
-                }
-              ].map((testimonial, i) => (
-                <div key={i} style={{ background: "#FFFFFF", border: "1px solid #E8EDF2", borderRadius: 16, padding: 40 }}>
-                  <p style={{ fontSize: 16, color: "#5A6B7D", lineHeight: 1.7, margin: "0 0 28px", fontStyle: "italic" }}>
-                    "{testimonial.text}"
-                  </p>
-                  <div style={{ display: "flex", alignItems: "center", gap: 16, borderTop: "1px solid #E8EDF2", paddingTop: 24 }}>
-                    <img src={testimonial.img} alt={testimonial.author} style={{ width: 48, height: 48, borderRadius: "50%", objectFit: "cover" }} />
-                    <div>
-                      <div style={{ fontSize: 16, fontWeight: 600, color: "#002B54", marginBottom: 4 }}>
-                        {testimonial.author}
-                      </div>
-                      <div style={{ fontSize: 14, color: "#CC7700" }}>
-                        {testimonial.role}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
         {/* CTA Final — fond clair, carte */}
-        <div className="section-padding" style={{ padding: "120px 48px", background: "#FFFFFF" }}>
+        <div className="section-padding" style={{ padding: "120px 48px", background: "#FAFDFD" }}>
           <div style={{ maxWidth: 820, margin: "0 auto" }}>
             <div style={{ background: "#001B38", borderRadius: 24, padding: "72px 56px", textAlign: "center", position: "relative", overflow: "hidden" }}>
               <div style={{ position: "absolute", top: -100, right: -100, width: 320, height: 320, borderRadius: "50%", background: "radial-gradient(ellipse, rgba(255,149,0,0.12) 0%, transparent 70%)", pointerEvents: "none" }} />

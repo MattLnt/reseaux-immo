@@ -31,7 +31,6 @@ export default function AdminLayoutClient({ children, session }) {
   const [collapsed, setCollapsed] = useState(false)
   const pathname = usePathname()
 
-  // Pour gérer l'état actif sur les sous-pages (ex: /dashboard/admin/agences/abc-123)
   const isActiveItem = (href) => {
     if (href === '/dashboard/admin') return pathname === '/dashboard/admin'
     return pathname === href || pathname.startsWith(`${href}/`)
@@ -66,11 +65,9 @@ export default function AdminLayoutClient({ children, session }) {
         {/* Logo + toggle */}
         <div style={{ padding: collapsed ? '20px 0' : '20px 20px', display: 'flex', alignItems: 'center', justifyContent: collapsed ? 'center' : 'space-between', borderBottom: '1px solid rgba(255,255,255,0.1)', minHeight: 64 }}>
           {!collapsed && (
-            <Link href="/" style={{ textDecoration: 'none' }}>
-              <div style={{ fontSize: 16, fontWeight: 700, color: '#FFFFFF', letterSpacing: '-0.01em' }}>
-                Réseaux <span style={{ color: '#FF9500' }}>Immo</span>
-              </div>
-              <div style={{ fontSize: 10, color: '#FF9500', fontWeight: 700, letterSpacing: '0.1em', marginTop: 3 }}>ADMINISTRATION</div>
+            <Link href="/" style={{ textDecoration: 'none', display: 'flex', flexDirection: 'column', gap: 4 }}>
+              <img src="/logo-white.svg" alt="OnShare" style={{ height: 58, width: 'auto', display: 'block' }} />
+              <div style={{ fontSize: 9, color: '#FF9500', fontWeight: 700, letterSpacing: '0.12em' }}>ADMINISTRATION</div>
             </Link>
           )}
           <button onClick={() => setCollapsed(!collapsed)} aria-label="Toggle sidebar" style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(255,255,255,0.5)', padding: 6, borderRadius: 6, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>

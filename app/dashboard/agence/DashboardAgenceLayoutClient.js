@@ -69,10 +69,8 @@ export default function DashboardAgenceLayoutClient({ children, session }) {
       <aside className="agence-desktop" style={{ width: collapsed ? 68 : 240, background: '#001B38', display: 'flex', flexDirection: 'column', position: 'fixed', top: 0, left: 0, bottom: 0, overflowY: 'auto', overflowX: 'hidden', transition: 'width 0.25s ease', zIndex: 50 }}>
         <div style={{ padding: collapsed ? '20px 0' : '20px 20px', display: 'flex', alignItems: 'center', justifyContent: collapsed ? 'center' : 'space-between', borderBottom: '1px solid rgba(255,255,255,0.1)', minHeight: 64 }}>
           {!collapsed && (
-            <Link href="/" style={{ textDecoration: 'none' }}>
-              <div style={{ fontSize: 16, fontWeight: 700, color: '#FFFFFF', letterSpacing: '-0.01em' }}>
-                Réseaux <span style={{ color: '#FF9500' }}>Immo</span>
-              </div>
+            <Link href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
+              <img src="/logo-white.svg" alt="OnShare" style={{ height: 58, width: 'auto', display: 'block' }} />
             </Link>
           )}
           <button onClick={() => setCollapsed(!collapsed)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(255,255,255,0.5)', padding: 6, borderRadius: 6, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
