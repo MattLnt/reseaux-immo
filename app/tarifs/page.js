@@ -10,7 +10,7 @@ export default function TarifsPage() {
     { icon: "💬", title: "Messagerie interne", desc: "Échangez directement et en sécurité avec les autres agences." },
     { icon: "🔔", title: "Alertes & notifications", desc: "Soyez prévenu par email à chaque nouveau bien ou nouveau contact." },
     { icon: "📊", title: "Tableau de bord & statistiques", desc: "Suivez vos biens, vos contacts et vos performances en temps réel." },
-    { icon: "📇", title: "Gestion des contacts", desc: "Suivez chaque contact envoyé ou reçu : signé, en cours, etc." },
+    { icon: "📇", title: "Encodage acheteurs", desc: "Centralisez vos acheteurs potentiels et leurs critères de recherche." },
     { icon: "🏢", title: "Profil agence complet", desc: "Bureaux, horaires, logo, photos et description de votre agence." },
   ];
 
@@ -32,7 +32,7 @@ export default function TarifsPage() {
         }
       `}</style>
 
-      <PublicNav />
+      <PublicNav dark />
 
       {/* Hero */}
       <div className="tarifs-hero" style={{ background: "#001B38", padding: "160px 48px 100px", textAlign: "center", position: "relative", overflow: "hidden" }}>
@@ -40,13 +40,13 @@ export default function TarifsPage() {
         <div className="fade-up" style={{ position: "relative", zIndex: 1 }}>
           <div style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "rgba(255,149,0,0.12)", border: "1px solid rgba(255,149,0,0.3)", borderRadius: 24, padding: "8px 18px", marginBottom: 28 }}>
             <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#FF9500" }} />
-            <span style={{ fontSize: 12, fontWeight: 700, color: "#FF9500", letterSpacing: "0.08em" }}>TARIF UNIQUE</span>
+            <span style={{ fontSize: 12, fontWeight: 700, color: "#FF9500", letterSpacing: "0.08em" }}>OFFRE DE LANCEMENT</span>
           </div>
           <h1 style={{ fontSize: 56, fontWeight: 700, color: "#fff", margin: "0 0 20px", letterSpacing: "-0.03em", lineHeight: 1.1 }}>
             Un seul abonnement.<br />Tout le réseau.
           </h1>
           <p style={{ fontSize: 17, color: "rgba(255,255,255,0.7)", maxWidth: 520, margin: "0 auto", lineHeight: 1.7 }}>
-            Pas de plans compliqués, pas de commission cachée. Un tarif clair pour accéder à l'ensemble du réseau d'agences immobilières belges.
+            Pas de plans compliqués, pas de commission cachée. Un tarif clair pour accéder à l'ensemble du réseau d'agences immobilières.
           </p>
         </div>
       </div>
@@ -64,10 +64,10 @@ export default function TarifsPage() {
                   <span style={{ fontSize: 11, fontWeight: 700, color: "#FF9500", letterSpacing: "0.06em" }}>AGENCE PARTENAIRE</span>
                 </div>
                 <div style={{ display: "flex", alignItems: "baseline", gap: 8, marginBottom: 8 }}>
-                  <span className="tarifs-prix" style={{ fontSize: 84, fontWeight: 700, color: "#fff", letterSpacing: "-0.04em", lineHeight: 1 }}>299 €</span>
+                  <span className="tarifs-prix" style={{ fontSize: 84, fontWeight: 700, color: "#fff", letterSpacing: "-0.04em", lineHeight: 1 }}>150 €</span>
                   <span style={{ fontSize: 20, color: "rgba(255,255,255,0.45)", fontWeight: 400 }}>/mois</span>
                 </div>
-                <p style={{ fontSize: 14, color: "rgba(255,255,255,0.5)", margin: "0 0 32px" }}>HTVA · Sans engagement · Résiliable à tout moment</p>
+                <p style={{ fontSize: 14, color: "rgba(255,255,255,0.5)", margin: "0 0 32px" }}>HTVA · Offre de lancement</p>
 
                 <div style={{ height: 1, background: "rgba(255,255,255,0.1)", marginBottom: 28 }} />
 
@@ -105,7 +105,7 @@ export default function TarifsPage() {
                 {[
                   { num: "01", text: "Vous encodez un bien et indiquez le taux de commission que vous offrez à l'agence apporteuse." },
                   { num: "02", text: "Une autre agence trouve un acheteur et vous transmet ses coordonnées via la plateforme." },
-                  { num: "03", text: "La vente se conclut : vous rétribuez l'agence apporteuse selon le taux annoncé. Réseaux Immo ne touche rien." },
+                  { num: "03", text: "La vente se conclut : vous rétribuez l'agence apporteuse selon le taux annoncé. OnShare ne touche rien." },
                 ].map((step, i) => (
                   <div key={i} style={{ display: "flex", gap: 14, alignItems: "flex-start" }}>
                     <div style={{ width: 36, height: 36, borderRadius: 10, background: "#002B54", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 700, color: "#FF9500", flexShrink: 0 }}>
@@ -154,7 +154,7 @@ export default function TarifsPage() {
                 Inscrivez votre agence dès aujourd'hui et commencez à vendre plus, ensemble.
               </p>
               <Link href="/register" style={{ display: "inline-flex", alignItems: "center", gap: 10, background: "#FF9500", color: "#fff", padding: "18px 40px", borderRadius: 12, fontSize: 16, fontWeight: 700, textDecoration: "none", boxShadow: "0 8px 24px rgba(255,149,0,0.35)" }}>
-                Inscrire mon agence — 299€/mois
+                Inscrire mon agence — 150€/mois
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
               </Link>
             </div>

@@ -24,19 +24,22 @@ enum Role {
 }
 
 model Agence {
-  id          String   @id @default(cuid())
-  nom         String
-  adresse     String
-  telephone   String
-  email       String
-  logo        String?
-  photo       String?
-  horaire     String?  @db.Text
-  description String?  @db.Text
-  
+  id            String   @id @default(cuid())
+  nom           String
+  adresse       String
+  telephone     String
+  email         String
+  numeroIPI     String?
+  prenomContact String?
+  nomContact    String?
+  logo          String?
+  photo         String?
+  horaire       String?  @db.Text
+  description   String?  @db.Text
+
   // Validation admin
   isActive    Boolean  @default(false)
-  
+
   // Relations
   user             User?
   biens            Bien[]
@@ -44,7 +47,7 @@ model Agence {
   conversationsA   Conversation[] @relation("AgenceA")
   conversationsB   Conversation[] @relation("AgenceB")
   messagesEnvoyes  Message[]
-  
+
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
@@ -53,7 +56,7 @@ model Bien {
   id          String   @id @default(cuid())
   agenceId    String
   agence      Agence   @relation(fields: [agenceId], references: [id], onDelete: Cascade)
-  
+
   // Infos principales
   prix            Int
   localisation    String
@@ -62,26 +65,26 @@ model Bien {
   m2Terrain       Int?
   m2Habitable     Int
   photos          String[]
-  
+
   // Infos optionnelles
   rendementLocatif  Float?
   peb               PEB?
   revenuCadastral   Int?
   descriptionCourte String?  @db.Text
-  
+
   // Commission & détails
   tauxCommission  Float
   partRetrocedee  Int       @default(30)
   typeBien        TypeBien
   etatBien        EtatBien
   lienAnnonce     String?
-  
+
   // Statut
   statut      StatutBien @default(ACTIF)
-  
+
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
-  
+
   @@index([statut])
   @@index([typeBien])
   @@index([prix])
@@ -117,6 +120,8 @@ enum EtatBien {
 
 enum StatutBien {
   ACTIF
+  SOUS_OPTION
+  VENDU
   ARCHIVE
   SUPPRIME
 }
@@ -125,13 +130,13 @@ model Acheteur {
   id              String   @id @default(cuid())
   agenceId        String
   agence          Agence   @relation(fields: [agenceId], references: [id], onDelete: Cascade)
-  
+
   // Identité (privée — jamais affichée aux autres agences)
   prenom          String
   nom             String
   email           String
   telephone       String
-  
+
   // Critères de recherche
   budgetMin       Int
   budgetMax       Int
@@ -140,20 +145,20 @@ model Acheteur {
   nbrChambresMin  Int?
   nbrSdbMin       Int?
   m2HabitableMin  Int?
-  
+
   // Profil
   profilMenage    ProfilMenage
   remarques       String?       @db.Text
-  
+
   // RGPD
   consentementRGPD Boolean      @default(false)
-  
+
   // Statut
   statut          StatutAcheteur @default(ACTIF)
-  
+
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt
-  
+
   @@index([agenceId])
   @@index([statut])
 }
@@ -175,40 +180,40 @@ enum StatutAcheteur {
 
 model Conversation {
   id          String   @id @default(cuid())
-  
+
   // Les 2 agences participantes
   agenceAId   String
   agenceA     Agence   @relation("AgenceA", fields: [agenceAId], references: [id], onDelete: Cascade)
-  
+
   agenceBId   String
   agenceB     Agence   @relation("AgenceB", fields: [agenceBId], references: [id], onDelete: Cascade)
-  
+
   messages    Message[]
-  
+
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-  
+
   @@index([agenceAId])
   @@index([agenceBId])
 }
 
 model Message {
   id              String   @id @default(cuid())
-  
+
   conversationId  String
   conversation    Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
-  
+
   senderId        String   // agenceId de l'expéditeur
   sender          Agence   @relation(fields: [senderId], references: [id], onDelete: Cascade)
-  
+
   content         String?  @db.Text
   attachmentUrl   String?
   attachmentName  String?
-  
+
   readAt          DateTime?
-  
+
   createdAt       DateTime @default(now())
-  
+
   @@index([conversationId])
   @@index([senderId])
 }

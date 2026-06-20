@@ -5,7 +5,17 @@ import { sendAgenceEnAttente, sendAdminNouvelleInscription } from '@/lib/emails'
 
 export async function POST(req) {
   try {
-    const { email, password, role, nomAgence, adresse, telephone } = await req.json()
+    const { 
+      email, 
+      password, 
+      role, 
+      nomAgence, 
+      adresse, 
+      telephone, 
+      numeroIPI, 
+      prenomContact, 
+      nomContact 
+    } = await req.json()
 
     // Validation
     if (!email || !password || !role) {
@@ -19,6 +29,12 @@ export async function POST(req) {
     }
     if (!nomAgence?.trim()) {
       return NextResponse.json({ message: 'Le nom de l\'agence est requis' }, { status: 400 })
+    }
+    if (!numeroIPI?.trim()) {
+      return NextResponse.json({ message: 'Le numéro IPI est requis' }, { status: 400 })
+    }
+    if (!prenomContact?.trim() || !nomContact?.trim()) {
+      return NextResponse.json({ message: 'Le prénom et le nom du contact sont requis' }, { status: 400 })
     }
 
     // Vérification email unique
@@ -42,6 +58,9 @@ export async function POST(req) {
             adresse: adresse?.trim() || '',
             telephone: telephone?.trim() || '',
             email: email,
+            numeroIPI: numeroIPI.trim(),
+            prenomContact: prenomContact.trim(),
+            nomContact: nomContact.trim(),
             isActive: false,
           },
         },

@@ -33,9 +33,11 @@ export default function ProfilForm({ initialData }) {
 
   const champs = [
     { label: "Nom de l'agence", done: !!form.nom },
+    { label: "Numéro IPI", done: !!form.numeroIPI },
     { label: "Téléphone", done: !!form.telephone },
     { label: "Email", done: !!form.email },
     { label: "Adresse", done: !!form.adresse },
+    { label: "Contact référent", done: !!form.prenomContact && !!form.nomContact },
     { label: "Horaires", done: !!form.horaire },
     { label: "Description", done: !!form.description },
   ];
@@ -112,13 +114,13 @@ export default function ProfilForm({ initialData }) {
         </div>
       )}
 
-      {/* Grille principale — pleine largeur */}
+      {/* Grille principale */}
       <div className="profil-grid" style={{ display: "grid", gridTemplateColumns: "1fr 340px", gap: 20, alignItems: "start" }}>
 
-        {/* Colonne gauche — les formulaires */}
+        {/* Colonne gauche — formulaires */}
         <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
 
-          {/* Coordonnées */}
+          {/* Coordonnées agence */}
           <div style={{ background: "#fff", borderRadius: 16, border: "1px solid #E8EDF2", padding: "24px 28px" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 22, paddingBottom: 16, borderBottom: "1px solid #F0F3F7" }}>
               <div style={{ width: 38, height: 38, borderRadius: 10, background: "rgba(255,149,0,0.1)", border: "1px solid rgba(255,149,0,0.2)", display: "flex", alignItems: "center", justifyContent: "center", color: "#FF9500" }}>
@@ -130,12 +132,21 @@ export default function ProfilForm({ initialData }) {
               </div>
             </div>
 
-            <div style={{ marginBottom: 16 }}>
-              <label style={labelStyle}>Nom de l'agence *</label>
-              <input type="text" value={form.nom || ""} onChange={e => setForm({ ...form, nom: e.target.value })} required
-                placeholder="Agence Dupont" style={inputStyle}
-                onFocus={e => e.target.style.borderColor = "#FF9500"}
-                onBlur={e => e.target.style.borderColor = "#E8EDF2"} />
+            <div className="profil-grid2" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 16 }}>
+              <div>
+                <label style={labelStyle}>Nom de l'agence *</label>
+                <input type="text" value={form.nom || ""} onChange={e => setForm({ ...form, nom: e.target.value })} required
+                  placeholder="Agence Dupont" style={inputStyle}
+                  onFocus={e => e.target.style.borderColor = "#FF9500"}
+                  onBlur={e => e.target.style.borderColor = "#E8EDF2"} />
+              </div>
+              <div>
+                <label style={labelStyle}>Numéro IPI</label>
+                <input type="text" value={form.numeroIPI || ""} onChange={e => setForm({ ...form, numeroIPI: e.target.value })}
+                  placeholder="Ex: 506.123" style={inputStyle}
+                  onFocus={e => e.target.style.borderColor = "#FF9500"}
+                  onBlur={e => e.target.style.borderColor = "#E8EDF2"} />
+              </div>
             </div>
 
             <div className="profil-grid2" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 16 }}>
@@ -161,6 +172,36 @@ export default function ProfilForm({ initialData }) {
                 placeholder="Rue Exemple 1, 1000 Bruxelles" style={inputStyle}
                 onFocus={e => e.target.style.borderColor = "#FF9500"}
                 onBlur={e => e.target.style.borderColor = "#E8EDF2"} />
+            </div>
+          </div>
+
+          {/* Contact référent */}
+          <div style={{ background: "#fff", borderRadius: 16, border: "1px solid #E8EDF2", padding: "24px 28px" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 22, paddingBottom: 16, borderBottom: "1px solid #F0F3F7" }}>
+              <div style={{ width: 38, height: 38, borderRadius: 10, background: "rgba(255,149,0,0.1)", border: "1px solid rgba(255,149,0,0.2)", display: "flex", alignItems: "center", justifyContent: "center", color: "#FF9500" }}>
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              </div>
+              <div>
+                <h2 style={{ fontSize: 15, fontWeight: 700, color: "#002B54", margin: 0 }}>Contact référent</h2>
+                <p style={{ fontSize: 12, color: "#9CA3AF", margin: 0 }}>Personne en charge du compte agence</p>
+              </div>
+            </div>
+
+            <div className="profil-grid2" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+              <div>
+                <label style={labelStyle}>Prénom</label>
+                <input type="text" value={form.prenomContact || ""} onChange={e => setForm({ ...form, prenomContact: e.target.value })}
+                  placeholder="Jean" style={inputStyle}
+                  onFocus={e => e.target.style.borderColor = "#FF9500"}
+                  onBlur={e => e.target.style.borderColor = "#E8EDF2"} />
+              </div>
+              <div>
+                <label style={labelStyle}>Nom</label>
+                <input type="text" value={form.nomContact || ""} onChange={e => setForm({ ...form, nomContact: e.target.value })}
+                  placeholder="Dupont" style={inputStyle}
+                  onFocus={e => e.target.style.borderColor = "#FF9500"}
+                  onBlur={e => e.target.style.borderColor = "#E8EDF2"} />
+              </div>
             </div>
           </div>
 

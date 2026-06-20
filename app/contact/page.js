@@ -42,7 +42,7 @@ function CustomSelect({ value, onChange, options, placeholder }) {
 }
 
 export default function ContactPage() {
-  const [form, setForm] = useState({ nom: "", email: "", sujet: "", message: "" });
+  const [form, setForm] = useState({ nom: "", nomAgence: "", telephone: "", email: "", sujet: "", message: "" });
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
 
@@ -73,7 +73,7 @@ export default function ContactPage() {
     display: "block", fontSize: 11, fontWeight: 700, color: "#5A6B7D",
     textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 8,
   };
-  const isValid = form.nom && form.email && form.sujet && form.message;
+  const isValid = form.nom && form.nomAgence && form.telephone && form.email && form.sujet && form.message;
 
   return (
     <div style={{ minHeight: "100vh", background: "#fff", fontFamily: "system-ui, -apple-system, sans-serif" }}>
@@ -89,7 +89,7 @@ export default function ContactPage() {
         }
       `}</style>
 
-      <PublicNav />
+      <PublicNav dark />
 
       {/* Hero */}
       <div className="contact-hero" style={{ background: "#001B38", padding: "160px 48px 80px", position: "relative", overflow: "hidden" }}>
@@ -118,7 +118,7 @@ export default function ContactPage() {
               </div>
               <h3 style={{ fontSize: 18, fontWeight: 700, color: "#15803D", margin: "0 0 8px" }}>Message envoyé !</h3>
               <p style={{ fontSize: 14, color: "#16A34A", margin: "0 0 24px" }}>Nous vous répondrons dans les 24 heures.</p>
-              <button onClick={() => { setSent(false); setForm({ nom: "", email: "", sujet: "", message: "" }); }}
+              <button onClick={() => { setSent(false); setForm({ nom: "", nomAgence: "", telephone: "", email: "", sujet: "", message: "" }); }}
                 style={{ background: "#002B54", color: "#fff", padding: "11px 22px", borderRadius: 10, fontSize: 13, fontWeight: 700, border: "none", cursor: "pointer" }}>
                 Envoyer un autre message
               </button>
@@ -134,9 +134,26 @@ export default function ContactPage() {
                     onBlur={e => e.target.style.borderColor = "#E8EDF2"} />
                 </div>
                 <div>
+                  <label style={labelStyle}>Nom de l'agence *</label>
+                  <input type="text" value={form.nomAgence} onChange={e => setForm({ ...form, nomAgence: e.target.value })} required
+                    placeholder="Agence Dupont SPRL" style={inputStyle}
+                    onFocus={e => e.target.style.borderColor = "#FF9500"}
+                    onBlur={e => e.target.style.borderColor = "#E8EDF2"} />
+                </div>
+              </div>
+
+              <div className="contact-form-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+                <div>
                   <label style={labelStyle}>Email *</label>
                   <input type="email" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} required
                     placeholder="vous@exemple.com" style={inputStyle}
+                    onFocus={e => e.target.style.borderColor = "#FF9500"}
+                    onBlur={e => e.target.style.borderColor = "#E8EDF2"} />
+                </div>
+                <div>
+                  <label style={labelStyle}>Téléphone *</label>
+                  <input type="tel" value={form.telephone} onChange={e => setForm({ ...form, telephone: e.target.value })} required
+                    placeholder="+32 4 12 34 56 78" style={inputStyle}
                     onFocus={e => e.target.style.borderColor = "#FF9500"}
                     onBlur={e => e.target.style.borderColor = "#E8EDF2"} />
                 </div>
@@ -182,9 +199,8 @@ export default function ContactPage() {
           <p style={{ fontSize: 13, color: "#9CA3AF", margin: "0 0 8px" }}>Plusieurs façons de nous joindre.</p>
 
           {[
-            { icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>, title: "Email", value: "contact@reseaux-immo.be", sub: "Réponse sous 24h" },
+            { icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>, title: "Email", value: "contact@onshare.be", sub: "Réponse sous 24h" },
             { icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>, title: "Disponibilité", value: "Lun — Ven", sub: "9h00 — 18h00" },
-            { icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>, title: "Localisation", value: "Belgique", sub: "Réseau de co-courtage immobilier" },
           ].map((item, i) => (
             <div key={i} style={{ background: "#FAFDFD", borderRadius: 14, border: "1px solid #E8EDF2", padding: "16px 18px", display: "flex", alignItems: "center", gap: 12 }}>
               <div style={{ width: 38, height: 38, borderRadius: 10, background: "rgba(255,149,0,0.1)", border: "1px solid rgba(255,149,0,0.2)", display: "flex", alignItems: "center", justifyContent: "center", color: "#FF9500", flexShrink: 0 }}>

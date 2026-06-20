@@ -175,23 +175,21 @@ export default function LoginPage() {
         {/* Colonne droite : Hero */}
         <div className="login-hero">
           <Link href="/" style={{ textDecoration: "none", display: "inline-block", marginBottom: 24 }}>
-            <h1 style={{ fontSize: 48, fontWeight: 700, color: "#FFFFFF", letterSpacing: "-0.02em", margin: 0 }}>
-              Réseaux <span style={{ color: "#FF9500" }}>Immo</span>
-            </h1>
+            <img src="/logo-white.svg" alt="OnShare" style={{ height: 64, width: "auto", display: "block" }} />
           </Link>
           <h2 style={{ fontSize: 32, fontWeight: 700, color: "#FFFFFF", lineHeight: 1.2, margin: "0 0 16px", letterSpacing: "-0.01em" }}>
             Bon retour sur<br />la plateforme
           </h2>
           <p style={{ fontSize: 16, color: "rgba(255,255,255,0.7)", lineHeight: 1.6, margin: "0 0 32px", maxWidth: 480 }}>
-            Connectez-vous pour accéder à votre espace agence et gérer vos biens en co-courtage.
+            Connectez-vous pour accéder à votre espace agence et gérer vos biens.
           </p>
 
           <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
             {[
               { icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>, title: "Plateforme sécurisée", desc: "Accès réservé aux agences" },
-              { icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>, title: "Vos biens", desc: "Gérez vos mandats exclusifs" },
+              { icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>, title: "Vos biens", desc: "Gérez vos mandats facilement" },
               { icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>, title: "Catalogue", desc: "Biens des autres agences" },
-              { icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>, title: "Contacts qualifiés", desc: "Acheteurs potentiels" },
+              { icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>, title: "Acheteurs", desc: "Encodez vos acheteurs potentiels" },
             ].map((item, i) => (
               <div key={i} style={{ display: "flex", alignItems: "center", gap: 14 }}>
                 <div style={{ width: 44, height: 44, borderRadius: 8, background: "rgba(255,255,255,0.1)", backdropFilter: "blur(10px)", display: "flex", alignItems: "center", justifyContent: "center", color: "#FF9500", flexShrink: 0 }}>
@@ -208,7 +206,7 @@ export default function LoginPage() {
       </div>
 
       <p style={{ fontSize: 11, color: "rgba(255,255,255,0.3)", marginTop: 32, position: "relative", zIndex: 1 }}>
-        © 2026 Réseaux Immo · Belgique
+        © 2026 OnShare
       </p>
     </main>
   );
