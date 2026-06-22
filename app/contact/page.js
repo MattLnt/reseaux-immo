@@ -45,6 +45,7 @@ export default function ContactPage() {
   const [form, setForm] = useState({ nom: "", nomAgence: "", telephone: "", email: "", sujet: "", message: "" });
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
+  const [error, setError] = useState("");
 
   const sujets = [
     { value: "question-generale", label: "Question générale" },
@@ -59,9 +60,40 @@ export default function ContactPage() {
   async function handleSubmit(e) {
     e.preventDefault();
     setLoading(true);
-    await new Promise(r => setTimeout(r, 1000));
-    setLoading(false);
-    setSent(true);
+    setError("");
+
+    try {
+      // Inclure le sujet dans le message pour que Coraline le voie dans l'email
+      const sujetLabel = sujets.find(s => s.value === form.sujet)?.label || form.sujet;
+      const messageFinal = `[Sujet : ${sujetLabel}]\n\n${form.message}`;
+
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          nom: form.nom,
+          nomAgence: form.nomAgence,
+          email: form.email,
+          telephone: form.telephone,
+          message: messageFinal,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.error || "Une erreur est survenue. Réessayez plus tard.");
+        setLoading(false);
+        return;
+      }
+
+      setLoading(false);
+      setSent(true);
+    } catch (err) {
+      console.error("Erreur envoi contact:", err);
+      setError("Impossible d'envoyer le message. Vérifiez votre connexion.");
+      setLoading(false);
+    }
   }
 
   const inputStyle = {
@@ -118,13 +150,20 @@ export default function ContactPage() {
               </div>
               <h3 style={{ fontSize: 18, fontWeight: 700, color: "#15803D", margin: "0 0 8px" }}>Message envoyé !</h3>
               <p style={{ fontSize: 14, color: "#16A34A", margin: "0 0 24px" }}>Nous vous répondrons dans les 24 heures.</p>
-              <button onClick={() => { setSent(false); setForm({ nom: "", nomAgence: "", telephone: "", email: "", sujet: "", message: "" }); }}
+              <button onClick={() => { setSent(false); setError(""); setForm({ nom: "", nomAgence: "", telephone: "", email: "", sujet: "", message: "" }); }}
                 style={{ background: "#002B54", color: "#fff", padding: "11px 22px", borderRadius: 10, fontSize: 13, fontWeight: 700, border: "none", cursor: "pointer" }}>
                 Envoyer un autre message
               </button>
             </div>
           ) : (
             <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+              {error && (
+                <div style={{ background: "#FEF2F2", border: "1px solid #FECACA", borderRadius: 10, padding: "12px 16px", color: "#DC2626", fontSize: 13, display: "flex", alignItems: "center", gap: 8 }}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                  {error}
+                </div>
+              )}
+
               <div className="contact-form-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
                 <div>
                   <label style={labelStyle}>Nom *</label>
